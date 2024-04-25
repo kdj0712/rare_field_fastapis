@@ -11,7 +11,7 @@
 ~$ docker-compose --project-name data_engineers up -d --build
 ```
 #### connect remote Docker container
-- @ http://localhost:8889/
+- @ Jupyter Notebook : http://localhost:8889/
 - @ mongodb://192.168.10.236:27018/ or mongodb://trainings.iptime.org:45003/
 
 #### samples
