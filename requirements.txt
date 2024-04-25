@@ -1,0 +1,41 @@
+# data analysis
+
+jupyterlab
+pyarrow
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+scikit-learn
+wget
+konlpy
+pymongo
+python-mecab-ko
+pyLDAvis
+transformers
+
+# fastapi
+
+fastapi
+pydantic
+uvicorn
+jinja2
+python-multipart
+pydantic-settings
+beanie
+email-validator
+python-dotenv
+aiohttp
+google-cloud-storage
+
+
+# web scrapping
+
+requests
+beautifulsoup4
+lxml
+selenium
+urllib3
+scrapy
+webdriver_manager
