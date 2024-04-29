@@ -136,6 +136,21 @@ async def guideline(request:Request, page_number: Optional[int] = 1):
 async def guideline(request:Request):
     return templates.TemplateResponse(name="trend/trend_guideline.html", context={'request':request})
 
+# 안으로 들어가서
+@router.get("/trend_guideline_read/{object_id}", response_class=HTMLResponse)
+async def trend_guideline_read_func(
+    request:Request
+    ,object_id : PydanticObjectId
+):
+    
+    guideline = await collection_trend_guideline.get(object_id)
+
+    return templates.TemplateResponse(
+        name="trend/trend_guideline_read.html"
+        , context={"request" : request, "guidelines" : guideline}
+    )
+
+
 #### -------------------------------------------------------------------------------------------------------
 
 # # 민원서식 삭제 처리
