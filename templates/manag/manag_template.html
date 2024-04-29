@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title%}
+
+        {% endblock title%}
+    </title>
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Customer CSS - commons.css -->
+    <!-- <link rel="stylesheet" href="/css/commons.css"> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Noto Sans KR", sans-serif;
+            font-optical-sizing: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="m-5 justify-content-start">
+        <a href="/manag/managmain">
+            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTAzMDVfOTcg%2FMDAxNTUxNzc4OTA3MTI1.92rvEEVtkWp_rXCp1R7qwb879mcHnAwam40eT9HsRAYg.kfWfMejkRFmyk3gCaqq08enzXk2XvqCcESbgY8hO9gwg.JPEG.icsebarcelona_1%2FICSEB-RDD.jpg&type=a340"
+                width="80" height="auto" alt="">
+        </a>
+    </div>
+    <div class="row ms-5">
+        <ul class="col-3 list-unstyled ps-0">
+            <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0">
+                <a href="/manag/managmain" class="text-decoration-none">Home</a>
+            </button>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/manag_user_main"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">회원관리</a>
+                </button>
+            </li>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/manag_community_main"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">커뮤니티관리</a>
+                </button>
+            </li>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/manag_program_main"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">프로그램서비스관리</a>
+                </button>
+            </li>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/manag_QnA_main"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">QnA관리</a>
+                </button>
+            </li>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/manag_notice_main"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">공지사항관리</a>
+                </button>
+            </li>
+            <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed">
+                    <a href="/manag/data_analytics"
+                        class="link-body-emphasis d-inline-flex text-decoration-none rounded">Data Analytics</a>
+                </button>
+            </li>
+        </ul>
+
+        <main class="col-6">
+            {% block main %}
+            {% endblock main %}
+        </main>
+    </div>
+
+    <hr>
+
+    <footer class=" container">
+        <div class="row justify-content-between">
+            <div class="col-2">
+                <h5>고객센터</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2">대표번호 : 010-6511-58**</li>
+                    <li class="nav-item mb-2"><a href="/other/other_QnA_main"
+                            class="nav-link p-0 text-body-secondary">QnA</a></li>
+                    <li class="nav-item mb-2"><a href="/other/other_notice"
+                            class="nav-link p-0 text-body-secondary">Notice</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-4 ">
+                <h5><a href="/rarefield" class="text-decoration-none">Rare Field</a></h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2">Company : (주)레어필드</li>
+                    <li>대표 : 조유경</li>
+                    <li class="nav-item mb-2">Address : 서울 구로구 디지털로26길 111 303호</li>
+                </ul>
+            </div>
+            <div class="col-6 ">
+                <form>
+                    <h5>무료 뉴스레터 구독</h5>
+                    <p>메일로 RareField 관련 소식을 받아보세요.</p>
+                    <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                        <label for="newsletter1" class="visually-hidden">Email address</label>
+                        <input type="email" id="newsletter1" type="text" class="form-control"
+                            placeholder="Email address">
+                        <button class="btn " type="button" style="background-color: #4b4b4b; color: white;">구독</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
+            <p>© 2024 RareField, Inc. All rights reserved.</p>
+            <ul class="list-unstyled d-flex">
+                <li class="ms-3"><a class="link-body-emphasis" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#twitter"></use>
+                        </svg></a></li>
+                <li class="ms-3"><a class="link-body-emphasis" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#instagram"></use>
+                        </svg></a></li>
+                <li class="ms-3"><a class="link-body-emphasis" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#facebook"></use>
+                        </svg></a></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+<!-- javascript는 body 다음에 넣어야 함. -->
+<!-- Latest compiled JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</html>

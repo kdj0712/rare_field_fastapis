@@ -1,0 +1,43 @@
+{% extends "/manag/manag_template.html"%}
+
+{% block main %}
+<main class="col-md-9 col-lg-10 px-md-4">
+  <form action="">
+    <h2>QnA</h2>
+    <div class="row">
+      <div class="col-2">
+        <select class="form-control" name="key_name">
+          <option value="dise_name_kr" {{ 'selected' if request._query_params.key_name=='dise_name_kr' else '' }}>제목
+          </option>
+
+        </select>
+      </div>
+      <div class="col-6">
+        <input class="form-control" placeholder="Enter Search!" name="search_word"
+          value="{{request._query_params.word}}">
+      </div>
+      <div class="col-4">
+        <button type="submit" class="btn btn-primary" formaction="/manag/manag_QnA" formmethod="get">검색</button>
+      </div>
+    </div>
+    <div style="text-align: end;">
+      <a class="btn btn-success" href="/manag/manag_write">글쓰기</a>
+    </div>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>번호</th>
+          
+          <th>제목</th>
+          <th>글쓴이</th>
+          <th>시간</th>
+        </tr>
+      </thead>
+
+    </table>
+    <div style="text-align: center;">
+      <h3>표시할 내용이 없습니다.</h3>
+    </div>
+  </form>
+</main>
+{% endblock main %}

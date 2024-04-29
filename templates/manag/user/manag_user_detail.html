@@ -1,0 +1,151 @@
+{% extends "/manag/manag_template.html"%}
+
+{% block main %}
+<form action="">
+    <div class="input-form col-md-9 col-lg-10 px-md-4">
+        <h4 class="m-5">회원정보 상세보기</h4>
+
+        <hr class="m-5">
+        <div>
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label for="user_name">이름</label>
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control " name="user_name" id="user_name"
+                        value="{{ User.user_name }}" disabled>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label for="user_phonenumber">전화번호</label>
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control" name="user_phonenumber" id="user_phonenumber"
+                        value="{{ User.user_phone }}" disabled>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label for="user_id">ID</label>
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control " name="user_id" id="user_id" value="{{ User.user_ID }}"
+                        disabled>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label for="user_pswd">Password</label>
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control " name="user_pswd" id="user_pswd"
+                        value="{{ User.user_pswd }}" disabled>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-2">
+                    <label for="user_email">이메일</label>
+                </div>
+                <div class="col-8">
+                    <input type="email" class="form-control" name="user_email" id="user_email"
+                        value="{{ User.user_email }}" disabled>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="mb-3 col-2">
+                    <label for="user_postcode">주소</label>
+                </div>
+                <div class="col-8">
+                    <div>
+                        <input type="text" class="form-control" id="user_postcode" name="user_postcode"
+                            value="{{ User.user_postcode }}" disabled>
+                        <input type="text" class="form-control" id="user_address" name="user_address"
+                            value="{{ User.user_address }}" disabled>
+                        <input type="text" class="form-control" id="user_detailed_address" name="user_detailed_address"
+                            value="{{User.user_detailed_address}}" disabled>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label class="col-2" for="user_sex">성별</label>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="user_sex" id="user_sex"
+                            value="{{ User.user_sex }}" disabled>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <div class="col-2">
+                        <label for="user_birth">생년월일</label>
+                    </div>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="user_birth" id="user_birth"
+                            value="{{ User.user_birth}}" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+
+            <p style="font-size: 70%; color:blue">선택 입력 사항</p>
+            <div class="mb-3">
+                <div class="mb-3">
+                    <div>
+                        <label for="path_select">가입 경로</label>
+                    </div>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="path_select" id="path_select"
+                            value="{{ User.path_select }}" disabled>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div>
+                        <label for="user_who">해당 사항</label>
+                    </div>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="user_who" id="user_who"
+                            value="{{ User.user_who }}" disabled>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div>
+                        <label for="ralated_diseases">관련 질환명</label>
+                        key_name
+                    </div>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="ralated_diseases" id="ralated_diseases"
+                            value="{{ User.ralated_diseases }}" disabled>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div>
+                        <label for="hope_info">사이트에서 얻고자 하는 정보</label>
+                    </div>
+                    <div class="col-8">
+                        <input type="text" class="form-control " name="hope_info" id="hope_info"
+                            value="{{ User.hope_info }}" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: end;" class="p-2">
+            <button class="btn btn-primary" type="submit" formaction="/manag/manag_user_main?page={{ current_page }}"
+                formmethod="get">목록</button>
+        </div>
+
+
+
+
+
+
+        <!-- </div>
+<hr>
+<textarea type="" class="form-control text-box" name="ques_answer" id="content" placeholder="답글은 최대 1개씩만 달 수 있습니다. 이 부분은 나중에 관리자 페이지로 이동할 예정"></textarea>
+<br>
+<div style="text-align: end;">
+<button class="btn btn-primary" type="submit" formaction="/other/other_reply/{{User.id}}" formmethod="post">답글달기</button>
+<button class="btn btn-danger" type="submit" formaction="/other/other_delete/{{User.id}}" formmethod="post">글 삭제</button>
+</div> -->
+</form>
+{% endblock %}

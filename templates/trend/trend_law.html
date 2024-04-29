@@ -1,0 +1,80 @@
+{% extends "maintemplate.html"%}
+{% block css %}
+<style>
+    * {
+        border-style: dotted 1px black;
+        font-family: "Noto Sans KR", sans-serif;
+        font-optical-sizing: auto;
+        list-style-type: none;
+        text-decoration: none;
+        color: black;
+        text-decoration-line: none;
+
+
+    }
+
+    #field {
+        font-size: larger;
+        font-weight: bold;
+    }
+
+    a,
+    li * {
+        text-decoration: none;
+        color: black;
+        text-decoration-line: none;
+
+
+        ;
+    }
+</style>
+{% endblock css %}
+{% block main_container %}
+<h4 class="text-center m-3 fw-bold" width="100%" height="100px"> <a href="/trend/trend_law">법/시행령/시행규칙</a> </h4>
+
+<div class="container" style="width: 80%">
+    <hr>
+    {% for law in laws %}
+    <div class="container" style="width: 80%;" onclick="location.href='{{law.link}}'">
+        <div class="tit">
+            <h5 class="">
+                {% if law.law_name==None %}
+                {% else %}
+                <a href="{{law.link}}" class="">
+                    {{law.law_name}}
+                    {% endif %}
+                </a>
+            </h5>
+        </div>
+        <div class="sub row justify-content-between">
+            <h7 class="name col-3">
+                {% if law.promulgation_number==None %}
+                {% else %}
+                <a href='{{law.link}}' class="">
+                    공포번호 : {{law.promulgation_number}}
+                    {% endif %}
+                </a>
+            </h7>
+            <h7 class="name col-3">
+                {% if law.promulgation_date==None %}
+                {% else %}
+                <a href='{{law.link}}' class="">
+                    공포일자 : {{law.promulgation_date.date()}}
+                    {% endif %}
+                </a>
+            </h7>
+            <h7 class="name col-3">
+                {% if law.start_date==None %}
+                {% else %}
+                <a href='{{law.link}}' class="">
+                    시행일자 : {{law.start_date.date()}}
+                    {% endif %}
+                </a>
+            </h7>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+</div>
+
+{% endblock main_container %}

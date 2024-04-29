@@ -1,0 +1,68 @@
+{% extends "/manag/manag_template.html"%}
+{% block main %}
+
+{% block css %}
+<!-- Quill의 CSS 파일 링크 -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-beta.0/dist/quill.snow.css" rel="stylesheet" />
+<!-- Quill 편집기의 스타일 지정 -->
+<style>
+    #editor {
+        height: 10rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+<main class="col-md-9 col-lg-10 px-md-4">
+    <form action="" method="get" id="form_first">
+        <div class="mb-3">
+
+            <label for="notice_title">제목</label>
+            <input type="" class="form-control" name="notice_title" id="notice_title" value="{{ notices.notice_title }}"
+                disabled>
+
+            <!-- 커뮤니티 유형은 추후 dropdown으로 변경 -->
+            <label for="notice_type">커뮤니티 유형</label>
+            <input type="" class="form-control" name="notice_type" id="notice_type" value="{{ notices.notice_type }}"
+                disabled>
+
+            <div>
+                <label>프로그램 내용</label>
+                <!-- Quill 편집기를 적용할 div 요소 -->
+              <input type="hidden" name="notice_content" id="editorContent" required>
+              <div id="editor"></div>
+            </div>
+
+            <div style="text-align: end;" class="p-2">
+                <button class="btn btn-primary" type="submit" formaction="/manag/manag_notice_main"
+                    formmethod="post">수정하기</button>
+                <a href="/manag/manag_notice_main" class="btn btn-danger">삭제하기</a>
+            </div>
+        </div>
+    </form>
+</main>
+
+<!-- Quill의 JavaScript 파일 링크 -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-beta.0/dist/quill.js"></script>
+
+<script>
+    let contentFromServer = '{{notices.notice_content | safe}}';
+
+    // Quill 편집기 초기화
+    let quill = new Quill('#editor', {
+        theme: 'snow',
+    });
+
+    // 서버에서 가져온 콘텐츠로 편집기를 채움
+    quill.root.innerHTML = contentFromServer;
+
+    let form = document.querySelector('#form_first');
+    form.onsubmit = function (event) {
+        let editorContentInput = document.querySelector('#editorContent');
+        editorContentInput.value = quill.root.innerHTML;
+
+    }; 
+
+</script>
+
+{% endblock main %}

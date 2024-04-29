@@ -5,12 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+<<<<<<< HEAD
+=======
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+>>>>>>> fe001c4 (commit)
             "name": "Python: FastAPI",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
             "args": [
+<<<<<<< HEAD
                 "apps.main:app",
+=======
+                "mainpage:app",
+>>>>>>> fe001c4 (commit)
                 "--reload",
                 "--host",
                 "0.0.0.0",
@@ -20,6 +35,7 @@
             "jinja": true,
             "justMyCode": true
         }
+<<<<<<< HEAD
         ,{
             "name": "Python: Current File",
             "type": "python",
@@ -29,5 +45,7 @@
             "justMyCode": true
         }
         ,
+=======
+>>>>>>> fe001c4 (commit)
     ]
 }

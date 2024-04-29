@@ -1,0 +1,60 @@
+{% extends "/manag/manag_template.html"%}
+{% block main %}
+
+{% block css %}
+<!-- Quill의 CSS 파일 링크 -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-beta.0/dist/quill.snow.css" rel="stylesheet" />
+<!-- Quill 편집기의 스타일 지정 -->
+<style>
+    #editor {
+        height: 10rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+<main class="col-md-9 col-lg-10 px-md-4">
+    <form action="" method="POST" id="myForm">
+        <div class="mb-3">
+
+            <label for="program_title">제목</label>
+            <input type="" class="form-control" name="program_title" id="program_title"
+                value="{{ program.program_title }}" disabled>
+
+            <!-- 커뮤니티 유형은 추후 dropdown으로 변경 -->
+            <label for="program_date">작성일자</label>
+            <input type="" class="form-control" name="program_date" id="program_date"
+                value="{{ program.program_date.date() }}" disabled>
+
+            <div>
+                <label for="program_content">프로그램 내용</label>
+                <!-- Quill 편집기를 적용할 div 요소 -->
+                <input type="hidden" name="editorContent" id="editorContent" disabled>
+                <div id="editor" name="program_content" value="">{{ program.program_content}}</div>
+            </div>
+            <div style="text-align: end;" class="p-2">
+                <button class="btn btn-primary" type="submit" formaction="/manag/manag_program_main"
+                    formmethod="post">수정하기</button>
+                <a href="/manag/manag_program_main" class="btn btn-danger">삭제하기</a>
+            </div>
+        </div>
+
+    </form>
+</main>
+
+<!-- Quill의 JavaScript 파일 링크 -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-beta.0/dist/quill.js"></script>
+
+<!-- Quill 편집기 초기화 스크립트 -->
+<script>
+    var quill = new Quill('#editor', {
+        theme: 'snow'
+    });
+    let form = document.querySelector('#form_first');
+    form.onsubmit = function (event) {
+        let editorContentInput = document.querySelector('#editorContent');
+        editorContentInput.value = quill.root.innerHTML;
+    };    
+</script>
+
+{% endblock main %}

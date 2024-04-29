@@ -1,0 +1,53 @@
+{% extends "/manag/manag_template.html"%}
+
+{% block main %}
+<main class="container">
+  <form action="">
+    <div>
+      <h2>{{ QnAs.ques_title }}</h2>
+    </div>
+
+    <div class="text-end">
+      <div>
+        글쓴이 : {{ QnAs.ques_writer }}
+      </div>
+      <div>작성시간 : {{ QnAs.ques_time.date() }}</div>
+    </div>
+
+    <hr>
+    
+    <div>
+      내용
+    </div>
+    <div class="p-4 p-md-5 mb-4 rounded bg-light text-dark">
+      <div class="col-md-6 px-0">
+        <p class="lead my-3">{{ QnAs.ques_content }}</p>
+      </div>
+    </div>
+    <div>
+
+    </div>
+    <div>
+      답변
+    </div>
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+      <div class="col p-4 d-flex flex-column position-static">
+        <p class="card-text mb-auto">{{ QnAs.ques_answer }}</p>
+      </div>
+    </div>
+    <div>
+
+    </div>
+    <hr>
+    <textarea type="" class="form-control text-box" name="ques_answer" id="content"
+      placeholder="답글은 최대 1개씩만 달 수 있습니다."></textarea>
+    <br>
+    <div style="text-align: end;">
+      <button class="btn btn-primary" type="submit" formaction="/manag/manag_QnA_read/{{QnAs.id}}"
+        formmethod="post">답글달기</button>
+      <button class="btn btn-danger" type="submit" formaction="/manag/manag_QnA_delete/{{QnAs.id}}" formmethod="post">글
+        삭제</button>
+    </div>
+  </form>
+</main>
+{% endblock main %}
