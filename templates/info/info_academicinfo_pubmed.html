@@ -43,7 +43,7 @@
                 <div class="col-2">
 
                     <button style="border: none; background: none;" type="submit" style="border:none; background: none;"
-                        formaction="/info/info_academicinfo" formmethod="get"><svg width="32" height="32"
+                        formaction="/info/info_academicinfo_pub_med" formmethod="get"><svg width="32" height="32"
                             viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g filter="url(#filter0_d_7_45)">
                                 <path
@@ -88,22 +88,14 @@
             {% for paper in papers %}
 
             <div class="tab-content container" style="width: 90%;" style="cursor: pointer;">
-                <p class="tab-pane fade show active">
-                    <a href="{{paper.research_url}}" style="color: #4b4b4b;" class="" target="_blank">원문출처
-                    </a>
-                </p>
                 <div class="tit">
                     <p class="fw-bold">
-                        {{paper.research_title}}
+                        {{paper.title}}
                         </a></p>
                 </div>
                 <div class="row justify-content-end text-end">
                     <p class="category col-2">
-                        <a style="color: #4b4b4b;" class="">{{paper.research_year}}
-                        </a>
-                    </p>
-                    <p class="category col-6 text-end">
-                        <a style="color: #4b4b4b;" class="">{{paper.research_institution}}
+                        <a style="color: #4b4b4b;" class="">{{paper.research_date}}
                         </a>
                     </p>
                 </div>
@@ -171,6 +163,7 @@
 
 
 {% block js %}
+
 
 <!-- jQuery를 불러오는 CDN -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
