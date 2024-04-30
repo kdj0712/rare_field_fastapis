@@ -137,6 +137,15 @@ class Database:
         if documents:
             return documents, pagination
         return documents, pagination
+    
+    async def gbcwp_reverse_date(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
+        total = await self.model.find(conditions).count()
+        pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
+        # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
+        documents = await self.model.find(conditions).sort([('news_datetime', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
+        if documents:
+            return documents, pagination
+        return documents, pagination
 
 if __name__ == '__main__':
     settings = Settings()
