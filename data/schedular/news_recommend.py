@@ -5,7 +5,7 @@ import os
 from konlpy.tag import Okt
 
 def dbconnect(Database_name, collection_name) :
-    mongoClient = MongoClient("mongodb://192.168.10.236:27017/")
+    mongoClient = MongoClient("mongodb://trainings.iptime.org:45003/")
     database = mongoClient[Database_name]
     collection = database[collection_name]
     return collection
@@ -23,7 +23,7 @@ def tokenizer(raw, pos=['Noun', 'Verb']):
     
 
 def update_news_trend_collection():
-    news_weekly_collection = dbconnect("Seleniums", "bosa_news_weekly")
+    news_weekly_collection = dbconnect("teamkim", "news_weekly")
     news_collection = dbconnect("teamkim", "trend_news_test")
     
     # daily 에 있는 내용 가지고 오기
