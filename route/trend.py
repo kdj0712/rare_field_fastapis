@@ -122,7 +122,7 @@ async def trend_law(request:Request):
 
 #### -------------------------------------------------------------------------------------------------------
 
-# 고시, 지침
+# 고시, 지침dd
 
 @router.get("/trend_guideline", response_class=HTMLResponse) 
 async def guideline(request:Request, page_number: Optional[int] = 1):
