@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Request
 from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 from database.connection import Database
 from beanie import PydanticObjectId
@@ -30,16 +30,32 @@ templates = Jinja2Templates(directory="templates/")
 async def trend_news(
     request:Request
     , page_number: Optional[int] = 1
-    , key_name: Optional[str] = Query(None)
-    , search_word: Optional[str] = Query(None)
+    , news_title : Optional[Union[str, int, float, bool]] = None
+    , news_paper : Optional[Union[str, int, float, bool]] = None
     , category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
     ):
     
     await request.form()
     
     conditions = {}
+    search_word = request.query_params.get('search_word')
+
+    # 검색
+    if search_word :
+        conditions.update({
+            "$or" : [
+                {"news_title" : {'$regex': search_word}}
+                ,{"news_paper" : {'$regex': search_word}}
+            ]
+        })
+
+    if news_title:
+        conditions.find({ 'news_title': { '$regex': search_word }})
+    if news_paper:
+        conditions.find({ 'news_paper': { '$regex': search_word }})
     
-    if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+    # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+    if category:  
         conditions['news_topic'] = category
         
     news_list, pagination = await collection_trend_news.getsbyconditionswithpagination(
@@ -48,7 +64,7 @@ async def trend_news(
     
     return templates.TemplateResponse(
         name="trend/trend_news.html", 
-        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category})
+        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category, 'search_word' : search_word})
 
 @router.post("/trend_news", response_class=HTMLResponse) 
 async def trend_news_post(
