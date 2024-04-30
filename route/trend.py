@@ -66,29 +66,29 @@ async def trend_news(
         name="trend/trend_news.html", 
         context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category, 'search_word' : search_word})
 
-@router.post("/trend_news", response_class=HTMLResponse) 
-async def trend_news_post(
-    request: Request,
-    page_number: Optional[int] = 1,
-    key_name: Optional[str] = Query(None),
-    search_word: Optional[str] = Query(None),
-    category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
-):
-    await request.form()
+# @router.post("/trend_news", response_class=HTMLResponse) 
+# async def trend_news_post(
+#     request: Request,
+#     page_number: Optional[int] = 1,
+#     key_name: Optional[str] = Query(None),
+#     search_word: Optional[str] = Query(None),
+#     category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
+# ):
+#     await request.form()
     
-    conditions = {}
+#     conditions = {}
     
-    if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
-        conditions['news_topic'] = category
+#     if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+#         conditions['news_topic'] = category
         
-    news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
-        conditions, page_number
-    )
+#     news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
+#         conditions, page_number
+#     )
     
-    return templates.TemplateResponse(
-        name="trend/trend_news.html", 
-        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category}
-    )
+#     return templates.TemplateResponse(
+#         name="trend/trend_news.html", 
+#         context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category}
+#     )
     
 # news_read
 
