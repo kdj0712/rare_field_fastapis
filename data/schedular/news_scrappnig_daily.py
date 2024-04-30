@@ -16,7 +16,7 @@ from datetime import datetime
 
 
 
-# 몽고 디비 연결dd
+# 몽고 디비 연결
 def dbconnect(collection) :
     mongoClient = MongoClient("mongodb://trainings.iptime.org:45003/")
     database = mongoClient["teamkim"]
