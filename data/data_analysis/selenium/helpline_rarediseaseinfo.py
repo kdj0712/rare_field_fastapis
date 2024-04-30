@@ -4,7 +4,7 @@ mongoClient = MongoClient("mongodb://trainings.iptime.org:45003")
 # database 연결
 database = mongoClient["data_analysis"]
 # collection 작업
-collection = database['selenium_helpline_rarediseaseinfo']
+collection = database['persona2_helpline_rarediseaseinfo']
 # insert 작업 진행
 # 크롤링 동작
 from selenium import webdriver
@@ -31,32 +31,44 @@ browser = webdriver.Chrome()
 
 # 웹 페이지 열기  
 # 크롤링할 웹 페이지 URL
-url = f"https://helpline.kdca.go.kr/cdchelp/ph/supbiz/selectMdepSupList.do?menu=B0102&pageIndex={i+1}&schGubun=tit&schSuplDcd=&schText="
-html_source = browser.get(url)
-first_content = browser.find_element(By.CSS_SELECTOR,value="#search-results > section > div.search-results-chunks > div > article:nth-child(6) > div.docsum-wrap > div.docsum-content > a")
-first_content.click()
-while True:
-    heading_title = browser.find_element(By.CSS_SELECTOR,value='.heading-title')
-    title = heading_title.text
-    try: 
-        browser.find_element(By.CSS_SELECTOR,value='#abstract')
-        abstract = browser.find_element(By.CSS_SELECTOR,value='#abstract')
-        abstract_text = abstract.text
-        abstract_text = ''
-    abstract_list = abstract_text.split('\n')
-    try:
-        artical_date = browser.find_element(By.CSS_SELECTOR,value='.cit').text
-        artical_date_list = artical_date.split(';')
-        artical_date_list = artical_date_list[0].split(':')
-        artical_date = artical_date_list[0]
-    except:
-        artical_date = ''
-    print(title)
-    print(artical_date)
-    print(abstract_list)
-    collection.insert_one({"title": title,"artical_date":artical_date,"abstract_list":abstract_list})
-    time.sleep(2)
-    next_btn = browser.find_element(By.CSS_SELECTOR,value='div.next.side-link.visible > a')
-    next_btn.click()
-    time.sleep(2)
+for i in range(129):
+    url = f"https://helpline.kdca.go.kr/cdchelp/ph/supbiz/selectMdepSupList.do?menu=B0102&pageIndex={i+66}&schGubun=tit&schSuplDcd=&schText="
+    html_source = browser.get(url)
+    for j in range(1, 11):
+        time.sleep(1)
+        num =  browser.find_element(By.CSS_SELECTOR,value=f"#frm > div > table > tbody > tr:nth-child({j}) > th").text
+        
+        raredisease_title = browser.find_element(By.CSS_SELECTOR,value=f"#frm > div > table > tbody > tr:nth-child({j}) > td > dl > dt").text
+        raredisease_title_list = raredisease_title.split('\n')
+        raredisease_title_KO = raredisease_title_list[0]
+        raredisease_title_ENG = raredisease_title_list[1]
+        
+        KCD_code = browser.find_element(By.CSS_SELECTOR,value=f"#frm > div > table > tbody > tr:nth-child({j}) > td > dl > dd > ul > li:nth-child(1)").text
+        KCD_code_list = KCD_code.split(' : ')
+        KCD_code = KCD_code_list[1]
+        
+        special_calculation = browser.find_element(By.CSS_SELECTOR,value=f"#frm > div > table > tbody > tr:nth-child({j}) > td > dl > dd > ul > li:nth-child(2)").text
+        special_calculation_list = special_calculation.split(' : ')
+        special_calculation = special_calculation_list[1]
+        
+        support = browser.find_element(By.CSS_SELECTOR,value=f"#frm > div > table > tbody > tr:nth-child({j}) > td > dl > dd > ul > li:nth-child(3)").text
+        support_list = support.split(' : ')
+        support_text = []
+        for x in range(len(support_list)):
+            try : 
+                support_num = support_list[x+1]
+                support_text.append(support_num)
+            except : 
+                pass
+        
+        print(num)
+        print(raredisease_title_KO)
+        print(raredisease_title_ENG)
+        print(KCD_code)
+        print(special_calculation)
+        print(support_text)
+        pass    
+    
+        collection.insert_one({"num": num, "raredisease_title_KO":raredisease_title_KO, "raredisease_title_ENG":raredisease_title_ENG, "KCD_code": KCD_code, "special_calculation": special_calculation, "support_text": support_text})
+
 pass
