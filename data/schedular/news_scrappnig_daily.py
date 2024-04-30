@@ -18,8 +18,8 @@ from datetime import datetime
 
 # 몽고 디비 연결dd
 def dbconnect(collection) :
-    mongoClient = MongoClient("mongodb://192.168.10.236:27017/")
-    database = mongoClient["Seleniums"]
+    mongoClient = MongoClient("mongodb://trainings.iptime.org:45003/")
+    database = mongoClient["teamkim"]
     collection = database[collection]
     return collection
 
@@ -35,7 +35,7 @@ def convert_to_datetime(orgin_str):
 
 def bosascrapping(browser_name, keyword) :
 
-    bosa_news_coll = dbconnect('bosa_news_weekly')
+    bosa_news_coll = dbconnect('news_weekly')
     # bosa_news_coll.delete_many({})
 
     chrome_options = Options()

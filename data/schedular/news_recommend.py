@@ -50,3 +50,4 @@ def update_news_trend_collection():
 
 if __name__ == "__main__" :
     update_news_trend_collection()
+    pass
