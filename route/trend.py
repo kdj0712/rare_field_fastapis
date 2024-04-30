@@ -58,7 +58,7 @@ async def trend_news(
     if category:  
         conditions['news_topic'] = category
         
-    news_list, pagination = await collection_trend_news.getsbyconditionswithpagination(
+    news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
     conditions, page_number
     )
     
@@ -81,7 +81,7 @@ async def trend_news_post(
     if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
         conditions['news_topic'] = category
         
-    news_list, pagination = await collection_trend_news.getsbyconditionswithpagination(
+    news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
         conditions, page_number
     )
     
