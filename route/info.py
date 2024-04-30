@@ -36,6 +36,12 @@ collection_trend = Database(news_trends)
 from models.academicinfo import academicinfo
 collection_academicinfo = Database(academicinfo)
 
+from models.info_academicinfo import info_academicinfo_Riss,info_academicinfo_eng
+
+collection_info_academicinfo_Riss = Database(info_academicinfo_Riss)
+collection_info_academicinfo_eng = Database(info_academicinfo_eng)
+
+
 templates = Jinja2Templates(directory="templates/")
 ### 검색 모델 적용 조건---------------------------------------------------------------------------------------
 def load_pickle_from_gcs(bucket_name, file_name):
@@ -79,6 +85,11 @@ def predict_disease(search_word):
 #### -------------------------------------------------------------------------------------------------------
 
 ### 병원 검색 모델 적용 펑션---------------------------------------------------------------------------------------
+
+class Position(BaseModel):
+    xPos: Optional[float] = None
+    yPos: Optional[float] = None
+    
 def find_hospital_code(input_value: str) -> str:
     """
     입력값을 기반으로 hospital_types에서 대응하는 코드를 찾아 반환합니다.
@@ -150,10 +161,10 @@ def search_hospitals(input_value: str, xPos: float, yPos: float):
     # API 요청 (API 키가 필요함)
     response = requests.get(fullUrl)
     data = response.json()
-    body_data = data['response']['body']
+    body_data = data['response']['body']['items']
     data_list.append(body_data)
     # 성공적으로 데이터를 받았을 때의 처리 로직
-    print(data_list)
+    return data_list
         
 #### -------------------------------------------------------------------------------------------------------
 
@@ -291,55 +302,68 @@ async def institution(request:Request):
 #### -------------------------------------------------------------------------------------------------------
 
 # 학술정보
-
-
-@router.post("/info_academicinfo", response_class=HTMLResponse) 
-# @router.get("/info_academicinfo/{page_number}")
+@router.get("/info_academicinfo/{page_number}")
 @router.get("/info_academicinfo")
 async def paper_list(
     request: Request,
-    # page_number: int = 1,
-    # key_name: Optional[str] = Query(None),
-    # search_word: Optional[str] = Query(None)
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
     ):
-    
     await request.form()
-    
     conditions = {}
-    
-    # key_name = request.query_params.get('key_name')
-    # search_word = request.query_params.get('search_word')
-    # if key_name and search_word:
-    #     if key_name == 'thesis_name':
-    #         conditions.update({ 'thesis_name': { '$regex': search_word }})
-    #     elif key_name == 'thesis_date':
-    #         conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
 
-        # papers, pagination = await collection_academicinfo.getsbyconditionswithpagination(conditions, page_number)
-    return templates.TemplateResponse(
-        name="/info/info_academicinfo.html",
-        context={'request': request, })#'papers': papers, 'pagination': pagination,'key_name': key_name,'search_word': search_word
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'research_title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_year': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
+        return templates.TemplateResponse(
+            name="/info/info_academicinfo.html",
+            context={'request': request,'papers': paper_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word })
 
-    # else: # key_name이 없을 경우 모든 질환의 리스트를 출력
-        # dise_list, pagination = await collection_academicinfo.getsbyconditionswithpagination(conditions, page_number)
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
 
-        # return templates.TemplateResponse(
-        #     name="/info/info_academicinfo.html",
-        #     context={'request': request, })#'papers': papers, 'pagination': pagination
+        return templates.TemplateResponse(
+            name="/info/info_academicinfo.html",
+            context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
 
-    
-# news_read
+@router.get("/info_academicinfo_pub_med/{page_number}")
+@router.get("/info_academicinfo_pub_med")
+async def paper_list_pub(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    await request.form()
+    conditions = {}
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_date': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions, page_number)
+        return templates.TemplateResponse(
+            name="/info/info_academicinfo_pubmed.html",
+            context={'request': request,'papers': paper_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word })
 
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions,page_number)
 
-
-
-# @router.get("/info_academicinfo", response_class=HTMLResponse)
-# async def academicinfos(request:Request):
-#     return templates.TemplateResponse(name="info/info_academicinfo.html", context={'request':request})
-
-# @router.post("/info_academicinfo", response_class=HTMLResponse)
-# async def academicinfos(request:Request):
-#     return templates.TemplateResponse(name="info/info_academicinfo.html", context={'request':request})
+        return templates.TemplateResponse(
+            name="/info/info_academicinfo_pubmed.html",
+            context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
 
 #### -------------------------------------------------------------------------------------------------------
 
@@ -379,16 +403,42 @@ under = {
 def get_hospital_code(hospital_name: str) -> int:
     return hospital_types.get(hospital_name, -1) 
 
-@router.post("/info_institutions", response_class=HTMLResponse) 
+# @router.post("/info_institutions", response_class=HTMLResponse) 
+# @router.get("/info_institutions?keyword={keyword}&pos={pos}") 
 @router.get("/info_institutions") 
-async def search_hospital(request: Request):
-    form_data = await request.form()
-    keyword = form_data.get('keyword')
-    pos = form_data.get('pos')
-    if keyword and pos:
-        yPos,xPos = pos.split(',')
+async def search_hospital(
+    request: Request,
+    keyword: Optional[str] = Query(None),
+    # yPos: Optional[str] = Query(None),
+    pos: Optional[str] = Query(None)):  # Pydantic 모델을 이용해 xPos와 yPos를 pos 객체로 받음):
+    # await request.form()
+    # keyword = request.query_params.get('keyword')
+    # lng = request.query_params.get('lng')
+    # lat = request.query_params.get('lat')
+    if keyword is None:
+        results = {}
+        return templates.TemplateResponse("info/info_institutions.html", {"request": request, "results": results,'API_KEY': api_key})
+    else:
+        yPos, xPos = pos.split(',')
+        # yPos = lng
+        # xPos = lat
+        yPos = float(yPos)
+        xPos = float(xPos)
         data_list = search_hospitals(keyword,xPos,yPos)
+        pass
         print(data_list)
-    elif keyword is None:
-            results = {}
-            return templates.TemplateResponse("info/info_institution.html", {"request": request, "results": results,'API_KEY': api_key})
+        # data_list를 distance 기준으로 정렬
+        sorted_data_list = sorted(data_list, key=lambda x: float(x['item'][0]['distance']))
+
+        # 필요한 정보만 추출
+        extracted_data = []
+        for hospital in sorted_data_list:
+            extracted_data.append({
+                'addr': hospital['addr'],
+                'yadmNm': hospital['yadmNm'],
+                'telno': hospital['telno'],
+                'XPos': hospital['XPos'],
+                'YPos': hospital['YPos']
+            })
+
+        return templates.TemplateResponse("info/info_institutions.html", {"request": request, "results": extracted_data,'API_KEY': api_key})

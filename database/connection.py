@@ -17,6 +17,7 @@ from models.trend_documents import trend_documents
 from models.trend_guideline import trend_guideline
 from models.trend_law import trend_law
 from models.trend_site import trend_site
+from models.info_academicinfo import info_academicinfo_Riss,info_academicinfo_eng
 
 import os
 
@@ -35,7 +36,11 @@ class Settings(BaseSettings):
         if self.DATABASE_URL is not None:
             client = AsyncIOMotorClient(self.DATABASE_URL)
             await init_beanie(database=client.get_default_database(),
-                              document_models=[academicinfo, diseases, Institutions, members, news_trends, QnA, program, notice, community, trend_documents, trend_guideline, trend_law, trend_site])
+                              document_models=[academicinfo, diseases, Institutions,
+                                                members, news_trends, QnA, program,
+                                                notice, community, trend_documents,
+                                                trend_guideline, trend_law,
+                                                trend_site, info_academicinfo_Riss,info_academicinfo_eng])
 
     class Config:
         env_file = ".env"
@@ -137,6 +142,32 @@ class Database:
         if documents:
             return documents, pagination
         return documents, pagination
+    
+    async def gbcwp_reverse_date(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
+        total = await self.model.find(conditions).count()
+        pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
+        # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
+        documents = await self.model.find(conditions).sort([('news_datetime', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
+        if documents:
+            return documents, pagination
+        return documents, pagination
+    async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
+        total = await self.model.find(conditions).count()
+        pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
+        # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
+        documents = await self.model.find(conditions).sort([('research_year', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
+        if documents:
+            return documents, pagination
+        return documents, pagination
+    async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
+        total = await self.model.find(conditions).count()
+        pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
+        # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
+        documents = await self.model.find(conditions).sort([('research_date', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
+        if documents:
+            return documents, pagination
+        return documents, pagination
+
 
 if __name__ == '__main__':
     settings = Settings()
