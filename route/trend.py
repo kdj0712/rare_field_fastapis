@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Request
 from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 from database.connection import Database
 from beanie import PydanticObjectId
@@ -30,49 +30,65 @@ templates = Jinja2Templates(directory="templates/")
 async def trend_news(
     request:Request
     , page_number: Optional[int] = 1
-    , key_name: Optional[str] = Query(None)
-    , search_word: Optional[str] = Query(None)
+    , news_title : Optional[Union[str, int, float, bool]] = None
+    , news_paper : Optional[Union[str, int, float, bool]] = None
     , category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
     ):
     
     await request.form()
     
     conditions = {}
+    search_word = request.query_params.get('search_word')
+
+    # 검색
+    if search_word :
+        conditions.update({
+            "$or" : [
+                {"news_title" : {'$regex': search_word}}
+                ,{"news_paper" : {'$regex': search_word}}
+            ]
+        })
+
+    if news_title:
+        conditions.find({ 'news_title': { '$regex': search_word }})
+    if news_paper:
+        conditions.find({ 'news_paper': { '$regex': search_word }})
     
-    if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+    # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+    if category:  
         conditions['news_topic'] = category
         
-    news_list, pagination = await collection_trend_news.getsbyconditionswithpagination(
+    news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
     conditions, page_number
     )
     
     return templates.TemplateResponse(
         name="trend/trend_news.html", 
-        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category})
+        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category, 'search_word' : search_word})
 
-@router.post("/trend_news", response_class=HTMLResponse) 
-async def trend_news_post(
-    request: Request,
-    page_number: Optional[int] = 1,
-    key_name: Optional[str] = Query(None),
-    search_word: Optional[str] = Query(None),
-    category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
-):
-    await request.form()
+# @router.post("/trend_news", response_class=HTMLResponse) 
+# async def trend_news_post(
+#     request: Request,
+#     page_number: Optional[int] = 1,
+#     key_name: Optional[str] = Query(None),
+#     search_word: Optional[str] = Query(None),
+#     category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
+# ):
+#     await request.form()
     
-    conditions = {}
+#     conditions = {}
     
-    if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
-        conditions['news_topic'] = category
+#     if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
+#         conditions['news_topic'] = category
         
-    news_list, pagination = await collection_trend_news.getsbyconditionswithpagination(
-        conditions, page_number
-    )
+#     news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
+#         conditions, page_number
+#     )
     
-    return templates.TemplateResponse(
-        name="trend/trend_news.html", 
-        context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category}
-    )
+#     return templates.TemplateResponse(
+#         name="trend/trend_news.html", 
+#         context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category}
+#     )
     
 # news_read
 
@@ -122,7 +138,7 @@ async def trend_law(request:Request):
 
 #### -------------------------------------------------------------------------------------------------------
 
-# 고시, 지침
+# 고시, 지침dd
 
 @router.get("/trend_guideline", response_class=HTMLResponse) 
 async def guideline(request:Request, page_number: Optional[int] = 1):
@@ -135,6 +151,21 @@ async def guideline(request:Request, page_number: Optional[int] = 1):
 @router.get("/trend_guideline", response_class=HTMLResponse) 
 async def guideline(request:Request):
     return templates.TemplateResponse(name="trend/trend_guideline.html", context={'request':request})
+
+# 안으로 들어가서
+@router.get("/trend_guideline_read/{object_id}", response_class=HTMLResponse)
+async def trend_guideline_read_func(
+    request:Request
+    ,object_id : PydanticObjectId
+):
+    
+    guideline = await collection_trend_guideline.get(object_id)
+
+    return templates.TemplateResponse(
+        name="trend/trend_guideline_read.html"
+        , context={"request" : request, "guidelines" : guideline}
+    )
+
 
 #### -------------------------------------------------------------------------------------------------------
 

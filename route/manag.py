@@ -167,12 +167,12 @@ async def manag_community_read_function(request:Request):
 
 # program_main
 
-@router.get("/manag_program_main/{page_number}")
+@router.get("/manag_program_main/{page_number}", response_class=HTMLResponse)
 @router.get("/manag_program_main", response_class=HTMLResponse) 
 
 async def program_main_function(
-    request:Request,
-    page_number: Optional[int] = 1
+    request:Request
+    , page_number: Optional[int] = 1
     , program_title: Optional[Union[str, int, float, bool]] = None
     ):
     
@@ -182,17 +182,13 @@ async def program_main_function(
     if search_word:
         conditions.update({
             "$or":[
-                {"program_title": {'$regex': search_word}},
+                {"program_title": {'$regex': search_word}}
             ]
         })
 
-        
-    # if program_title:
-    #     conditions.find({ 'program_title': { '$regex': search_word }})
-
     if program_title:
-        conditions["program_title"] = program_title
-    
+        conditions.find({ 'program_title': { '$regex': search_word }})
+
     program_list, pagination = await collection_manag_program.getsbyconditionswithpagination(
     conditions, page_number
     )

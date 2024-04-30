@@ -73,24 +73,24 @@ async def QnA_function(
         })
     pass
 
-    # if ques_title:
-    #     conditions.find({ 'ques_title': { '$regex': search_word }})
-    # pass
+    if ques_title:
+        conditions.find({ 'ques_title': { '$regex': search_word }})
+    pass
 
-    # try:
-    #     QnA_list, pagination = await collection_QnA.gbcwp_reverse(
-    #     conditions, page_number
-    # )
-    #     return templates.TemplateResponse(
-    #     name="other/other_QnA_main.html",
-    #     context={'request': request, 'QnAs': QnA_list, 'pagination': pagination,'search_word':search_word},
-    # )
+    try:
+        QnA_list, pagination = await collection_QnA.gbcwp_reverse(
+        conditions, page_number
+    )
+        return templates.TemplateResponse(
+        name="other/other_QnA_main.html",
+        context={'request': request, 'QnAs': QnA_list, 'pagination': pagination,'search_word':search_word},
+    )
 
-    # except:
-    #     return templates.TemplateResponse(
-    #     name="other/other_QnA_nonpage.html",
-    #     context={'request': request},
-    # )
+    except:
+        return templates.TemplateResponse(
+        name="other/other_QnA_nonpage.html",
+        context={'request': request},
+    )
 
 @router.post("/other_QnA_main", response_class=HTMLResponse) 
 async def QnA_function(request:Request,
@@ -131,23 +131,23 @@ async def QnA_function(request:Request,
         })
     pass
 
-#     if ques_title:
-#         conditions.find({ 'ques_title': { '$regex': search_word }})
-#     pass
-#     try:
-#         QnA_list, pagination = await collection_QnA.getsbyconditionswithpagination(
-#         conditions, page_number
-#     )
-#         return templates.TemplateResponse(
-#         name="other/other_QnA_main.html",
-#         context={'request': request, 'QnAs': QnA_list, 'pagination': pagination,'search_word':search_word},
-#     )
+    if ques_title:
+        conditions.find({ 'ques_title': { '$regex': search_word }})
+    pass
+    try:
+        QnA_list, pagination = await collection_QnA.getsbyconditionswithpagination(
+        conditions, page_number
+    )
+        return templates.TemplateResponse(
+        name="other/other_QnA_main.html",
+        context={'request': request, 'QnAs': QnA_list, 'pagination': pagination,'search_word':search_word},
+    )
 
-#     except:
-#         return templates.TemplateResponse(
-#         name="other/other_QnA_nonpage.html",
-#         context={'request': request},
-#     )
+    except:
+        return templates.TemplateResponse(
+        name="other/other_QnA_nonpage.html",
+        context={'request': request},
+    )
 
 # @router.get("/other_QnA_nonpage", response_class=HTMLResponse) 
 # async def QnA_function(request:Request):
