@@ -4,7 +4,7 @@ mongoClient = MongoClient("mongodb://trainings.iptime.org:45003")
 # database 연결
 database = mongoClient["data_analysis"]
 # collection 작업
-collection = database['persona1_kfrd_freeboard']
+collection = database['persona1_kord_freeboard']
 # insert 작업 진행
 # 크롤링 동작
 from selenium import webdriver
@@ -31,30 +31,29 @@ browser = webdriver.Chrome()
 
 # 웹 페이지 열기  
 # 크롤링할 웹 페이지 URL
-for i in range(1, 11):
-    url = f"https://www.kfrd.org/board/list.asp?page={i}&boardcd=104"
+for i in range(1, 184):
+    url = f"https://www.kord.or.kr/bbs/board.php?bo_table=0605&page={i}"
     html_source = browser.get(url)
-    for j in range(1, 11):
+    for j in range(1, 16):
         try : 
-            contents =  browser.find_element(By.CSS_SELECTOR,value=f"#wrap > div.container > div.contents > div.cont > div.board > table > tbody > tr:nth-child({j}) > td.b_tit > a")
+            contents =  browser.find_element(By.CSS_SELECTOR,value=f"#fboardlist > div > table > tbody > tr:nth-child({j}) > td.td_subject > div.subj-content > a")
             contents.click()
             time.sleep(1)
             
-            contents_title = browser.find_element(By.CSS_SELECTOR,value=f"#wrap > div.container > div.contents > div.cont > div > table > thead > tr > th").text
+            contents_title = browser.find_element(By.CSS_SELECTOR,value=f"#bo_v_title").text
             
-            contents_writer = browser.find_element(By.CSS_SELECTOR,value=f"#wrap > div.container > div.contents > div.cont > div > table > tbody > tr:nth-child(1) > td.b_tit3.b_line").text
-            contents_writer_list = contents_writer.split(' : ')
-            contents_writer = contents_writer_list[1]
+            contents_writer = browser.find_element(By.CSS_SELECTOR,value=f"#bo_v_info > div.hidden-xs > strong:nth-child(1) > span").text
             
-            contents_date = browser.find_element(By.CSS_SELECTOR,value=f"#wrap > div.container > div.contents > div.cont > div > table > tbody > tr:nth-child(1) > td:nth-child(2)").text
-            contents_date_list = contents_date.split(' : ')
-            contents_date = contents_date_list[1]
+            contents_date = browser.find_element(By.CSS_SELECTOR,value=f"#bo_v_info > div.hidden-xs > strong:nth-child(3)").text
             
-            contents_text = browser.find_element(By.CSS_SELECTOR,value=f"#wrap > div.container > div.contents > div.cont > div > table > tbody > tr:nth-child(2) > td").text
+            click_count = browser.find_element(By.CSS_SELECTOR,value=f"#bo_v_info > div.hidden-xs > strong:nth-child(4)").text
+            
+            contents_text = browser.find_element(By.CSS_SELECTOR,value=f"#bo_v_con").text
             
             print(contents_title)
             print(contents_writer)
             print(contents_date)
+            print(click_count)
             print(contents_text)
 
             browser.back()
@@ -65,6 +64,7 @@ for i in range(1, 11):
             "contents_title": contents_title
             , "contents_writer":contents_writer
             , "contents_date":contents_date
+            , "click_count": click_count
             , "contents_text": contents_text
             })
 
