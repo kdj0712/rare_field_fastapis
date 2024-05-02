@@ -34,8 +34,8 @@ url = "https://www.behcet.co.kr/login?url=https%3A%2F%2Fwww.behcet.co.kr%2F"
 html_source = browser.get(url)
 
 # 로그인 정보
-id = "tm2372"
-pw = "rladbwls91"
+id = "###"
+pw = "###"
 
 # 자유게시판 들어가기 & 로그인 시도
 element_login_field = browser.find_element(by=By.CSS_SELECTOR, value="#flogin > div.login-form > div:nth-child(1) > div > input")
