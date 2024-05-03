@@ -21,7 +21,7 @@ mongoClient = MongoClient("mongodb://trainings.iptime.org:45003/")
 # database 연결
 database = mongoClient["data_analysis"]
 # collection 작업
-collection = database['persona1_navercafe_parkinsons_two']
+collection = database['persona1_navercafe_parkinsons_three']
 
 # 로그인 창
 browser.get('https://nid.naver.com/nidlogin.login?mode=form&url=https%3A%2F%2Fwww.naver.com')
@@ -47,7 +47,9 @@ time.sleep(2)
 # 변수 초기화
 number = title = name = date = contents = num = reply_list = None
 # post_num = 514
-browser.get('https://cafe.naver.com/parkinson777/11952') # 네이버 카페 접속(파킨슨병)
+browser.get('https://cafe.naver.com/parkinson777/11952') # 네이버 카페 접속(파킨슨병)  ## 유경님 작업구간
+# browser.get('https://cafe.naver.com/parkinson777/10659') # 네이버 카페 접속(파킨슨병)  ## 유진 작업구간(시작x)
+
 browser.switch_to.frame('cafe_main') #프레임 전환
 while True:
 
@@ -67,7 +69,8 @@ while True:
         for reply in reply_list:
             review.append(reply.text)
     else :
-        reply_list = []
+        review = []
+        # reply_list = []
     print(reply_list)
 
 
