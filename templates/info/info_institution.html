@@ -28,7 +28,9 @@
               <td>{{result.yadmNm}}</td>
               <td>{{result.addr}}</td>
               <td>{{result.telno}}</td>
-              <td><a href="#" onclick="focusOnMap({{index}}); return false;">보기</a></td>
+              <td><a href="#" onclick="focusOnMap({{index}}); return false;">보기</a>
+              <input type="hidden" name="resultId" value="{{result.ykiho}}">
+              </td>
             </tr>
             {% endfor %}
           </table>
@@ -200,6 +202,5 @@
   window.onload = requestUserLocation;
 </script>
 <!-- Google Maps API Script -->
-<script src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&libraries=places&callback=initMap&language=ko"
-  async defer></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&libraries=places&callback=initMap&language=ko"></script>
 {% endblock js %}
