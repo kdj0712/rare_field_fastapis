@@ -33,11 +33,11 @@ async def NOTICE(
     notice_list, pagination = await collection_other_notice.getsbyconditionswithpagination(
     conditions, page_number)
     
-    return templates.TemplateResponse(name="other/other_notice.html", context={'request' :request, 'notices' : notice_list, 'pagination' : pagination})
+    return templates.TemplateResponse(name="other/other_notice_main.html", context={'request' :request, 'notices' : notice_list, 'pagination' : pagination})
 
 @router.post("/other_notice", response_class=HTMLResponse)
 async def NOTICE(request:Request):
-    return templates.TemplateResponse(name="other/other_notice.html", context={'request' :request})
+    return templates.TemplateResponse(name="other/other_notice_main.html", context={'request' :request})
 
 #### -------------------------------------------------------------------------------------------------------
 
@@ -272,8 +272,8 @@ async def FAQ(request:Request,object_id:PydanticObjectId):
 # 글쓰기 창
 @router.get("/other_notice", response_class=HTMLResponse) 
 async def FAQ(request:Request):
-    return templates.TemplateResponse(name="other/other_notice.html", context={'request':request})
+    return templates.TemplateResponse(name="other/other_notice_main.html", context={'request':request})
 
 @router.post("/other_notice", response_class=HTMLResponse) 
 async def FAQ(request:Request):
-    return templates.TemplateResponse(name="other/other_notice.html", context={'request':request})
+    return templates.TemplateResponse(name="other/other_notice_main.html", context={'request':request})
