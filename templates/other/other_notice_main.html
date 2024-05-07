@@ -1,0 +1,244 @@
+{% extends "maintemplate.html" %}
+
+{% block main_container %}
+
+<style>
+    .table-fixed td,
+    .table-fixed th {
+      white-space: nowrap;
+      width: 100px;
+      /* 또는 원하는 너비 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    .center-fixed {
+      text-align: center;
+      white-space: nowrap;
+      width: 100px;
+      /* 조정 가능한 너비 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    .text-center {
+      text-align: center;
+    }
+  
+    li.col-3 {
+      padding: 5px;
+      margin: 10px;
+    }
+  
+    li.col-3:hover {
+      background-color: deepskyblue;
+    }
+  
+    .btn-4 {
+      background-color: #4dccc6;
+      background-image: linear-gradient(315deg, #4dccc6 0%, #96e4df 74%);
+      line-height: 42px;
+      padding-left: 10px;
+      padding-right: 10px;
+      border: none;
+    }
+  
+    .btn-4:hover {
+      background-color: #89d8d3;
+      background-image: linear-gradient(315deg, #89d8d3 0%, #03c8a8 74%);
+    }
+  
+    .btn-4 span {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  
+    .btn-4:before,
+    .btn-4:after {
+      position: absolute;
+      content: "";
+      right: 0;
+      top: 0;
+      box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, .9),
+        -4px -4px 6px 0 rgba(116, 125, 136, .2),
+        inset -4px -4px 6px 0 rgba(255, 255, 255, .9),
+        inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+      transition: all 0.3s ease;
+    }
+  
+    .btn-4:before {
+      height: 0%;
+      width: .1px;
+    }
+  
+    .btn-4:after {
+      width: 0%;
+      height: .1px;
+    }
+  
+    .btn-4:hover:before {
+      height: 100%;
+    }
+  
+    .btn-4:hover:after {
+      width: 100%;
+    }
+  
+    .btn-4 span:before,
+    .btn-4 span:after {
+      position: absolute;
+      content: "";
+      left: 0;
+      bottom: 0;
+      box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, .9),
+        -4px -4px 6px 0 rgba(116, 125, 136, .2),
+        inset -4px -4px 6px 0 rgba(255, 255, 255, .9),
+        inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+      transition: all 0.3s ease;
+    }
+  
+    .btn-4 span:before {
+      width: .1px;
+      height: 0%;
+    }
+  
+    .btn-4 span:after {
+      width: 0%;
+      height: .1px;
+    }
+  
+    .btn-4 span:hover:before {
+      height: 100%;
+    }
+  
+    .btn-4 span:hover:after {
+      width: 100%;
+    }
+</style>
+
+<main class="container">
+  <h4 class="text-center fw-bold" width="100%" height="100px"> <a style="color: black; text-decoration: none;"
+    href="/other/other_notice_main">공지사항</a> </h4>
+    <form>
+      <div class="justify-content-center row">
+        <div class="row col-7" style="align-items: center;">
+          <div class="col-3">
+            <select class="form-control" name="key_name">
+              <option value="notice_title" {{ 'selected' if request._query_params.key_name=='notice_title' else '' }}>
+                제목
+              </option>
+            </select>
+          </div>
+          <div class="col-7">
+            <input class="form-control" placeholder="Enter Search!" name="search_word" id="search_keyword"
+              value="{{request._query_params.search_word}}">
+          </div>
+  
+          <div class="col-2">
+            <button type="submit" style="border:none; background: none;" formaction="/other/other_notice_main"
+              formmethod="get"><svg width="50" height="50" viewBox="0 0 80 80" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_d_7_45)">
+                  <path d="M5 40C5 20.67 20.67 5 40 5C59.33 5 75 20.67 75 40C75 59.33 59.33 75 40 75C20.67 75 5 59.33 5 40Z"
+                    fill="#04CBFC" fill-opacity="0.47" shape-rendering="crispEdges" />
+                </g>
+                <path d="M35 50L45 40L35 30" stroke="white" stroke-width="5" stroke-linecap="round" />
+                <defs>
+                  <filter id="filter0_d_7_45" x="0" y="0" width="80" height="80" filterUnits="userSpaceOnUse"
+                    color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                      result="hardAlpha" />
+                    <feOffset />
+                    <feGaussianBlur stdDeviation="2.5" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_7_45" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_7_45" result="shape" />
+                  </filter>
+                </defs>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 글쓰기 버튼 -->
+    <div class="text-center"
+    style="width: 10%; height: 40px; margin-bottom: 10px; border-radius: 45px; box-shadow: 0px 0px 5px rgba(0,0,0,0.1); align-items: center;">
+    <a href="#" submit=javascript:fn; return false; title="글쓰기">글쓰기</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th class="center-fixed">번호</th>
+                <th class="center-fixed">제목</th>
+                <th class="center-fixed">작성일</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notice in notices %}
+            <tr onclick="location.href='/other/other_notice_read/{{notice.id}}'" style="cursor: pointer;">
+                <td>{{pagination.start_record_number + loop.index0}}</td>
+                <td>{{notice.notice_title}}</td>
+                <td>{{notice.notice_date.date()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+      <!-- pagination -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {{ '' if pagination.has_previous_block else 'disabled' }}">
+          <button style="border: none; background: none;" type="submit" class="page-link"
+            formaction="/other/other_notice_main{{pagination.first_page}}?{% if request._query_params.key_name %}key_name={{ request._query_params.key_name|urlencode }}{% endif %}{% if request._query_params.search_word %}&search_word={{ request._query_params.search_word|urlencode }}{% endif %}">
+            <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 3L12 9L18 15" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+              <path d="M10 3L4 9L10 15" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </li>
+        <li class="page-item {{ '' if pagination.has_previous_page else 'disabled' }}">
+          <button style="border: none; background: none;" type="submit" class="page-link"
+            formaction="/other/other_notice_main{{pagination.previous_page}}?{% if request._query_params.key_name %}key_name={{ request._query_params.key_name|urlencode }}{% endif %}{% if request._query_params.search_word %}&search_word={{ request._query_params.search_word|urlencode }}{% endif %}"><svg
+              width="13" height="18" viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 3L4 9L10 15" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+            </svg></button>
+        </li>
+        {% for page_num in pagination.current_page_range %}
+        <li class=" page-item {{ 'active' if page_num == pagination.current_page else '' }}">
+          <button style="border: none; background: none; color: black;" type=" submit" class="page-link"
+            formaction="/other/other_notice_main{{ page_num }}?{% if request._query_params.key_name %}key_name={{ request._query_params.key_name|urlencode }}{% endif %}{% if request._query_params.search_word %}&search_word={{ request._query_params.search_word|urlencode }}{% endif %}">
+            {{page_num}}
+          </button>
+        </li>
+        {% endfor %}
+        <li class=" page-item {{ '' if pagination.has_next_page else 'disabled' }}">
+          <button style="border: none; background: none;" type=" submit" class="page-link"
+            formaction="/other/other_notice_main{{ pagination.next_page }}?{% if request._query_params.key_name %}key_name={{ request._query_params.key_name|urlencode }}{% endif %}{% if request._query_params.search_word %}&search_word={{ request._query_params.search_word|urlencode }}{% endif %}"><svg
+              width="13" height="18" viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 15L9 9L3 3" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+            </svg>
+            <path d="M4 0V22" stroke="#EDEDED" stroke-width="7" />
+            </svg>
+          </button>
+        </li>
+        <li class=" page-item {{ '' if pagination.has_next_block else ' disabled' }}">
+          <button style="border: none; background: none;" type=" submit" class="page-link"
+            formaction="/other/other_notice_main{{ pagination.last_page }}?{% if request._query_params.key_name %}key_name={{ request._query_params.key_name|urlencode }}{% endif %}{% if request._query_params.search_word %}&search_word={{ request._query_params.search_word|urlencode }}{% endif %}">
+            <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 15L9 9L3 3" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+              <path d="M11 15L17 9L11 3" stroke="#696969" stroke-width="5" stroke-linecap="round" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+</main>
+{% endblock %}
