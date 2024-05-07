@@ -348,7 +348,8 @@ async def search_hospital(
                     'yadmNm': hospital['yadmNm'],
                     'telno': hospital['telno'],
                     'XPos': hospital['XPos'],
-                    'YPos': hospital['YPos']
+                    'YPos': hospital['YPos'],
+                    'ykiho': hospital['ykiho']
                 })
 
             return templates.TemplateResponse("info/info_institution.html", {"request": request, "results": extracted_data,'API_KEY': api_key})
