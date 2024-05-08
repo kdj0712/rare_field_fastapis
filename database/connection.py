@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     container_prefix: Optional[str] = None
     API_KEY : Optional[str] = None
     PUBLIC_API_KEY : Optional[str] = None
+    id : Optional[str] = None
+    pw : Optional[str] = None
     async def initialize_database(self):
         if self.DATABASE_URL is not None:
             client = AsyncIOMotorClient(self.DATABASE_URL)
