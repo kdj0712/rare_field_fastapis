@@ -20,7 +20,7 @@ from models.user_member import members
 collection_member = Database(members)
 from models.other_QnA import QnA
 collection_QnA = Database(QnA)
-from models.notice_list import notice
+from models.manag_notice_list import notice
 collection_manag_notice = Database(notice)
 from models.program_list import program
 collection_manag_program = Database(program)

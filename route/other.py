@@ -13,7 +13,7 @@ templates = Jinja2Templates(directory="templates/")
 # db 연결
 from models.other_QnA import QnA
 collection_QnA = Database(QnA)
-from models.notice_list import notice
+from models.manag_notice_list import notice
 collection_other_notice = Database(notice)
 
 

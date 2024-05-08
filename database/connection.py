@@ -10,7 +10,7 @@ from models.institution import Institutions
 from models.user_member import members
 from models.trend_news import news_trends
 from models.other_QnA import QnA
-from models.notice_list import notice
+from models.manag_notice_list import notice
 from models.program_list import program
 from models.empo_community import community
 from models.trend_documents import trend_documents

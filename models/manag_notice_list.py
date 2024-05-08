@@ -11,4 +11,4 @@ class notice(Document):
     notice_content: Optional[str] = None
     
     class Settings:
-        name = "notice_list"
+        name = "manag_notice_list"
