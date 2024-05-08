@@ -181,15 +181,6 @@ def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: in
     input_value = preprocess_input(input_value)
     code = find_hospital_code(input_value)
     radius = set_search_radius(xPos, yPos,under)
-    
-    # if code and input_value.strip() in hospital_types:
-    #     param = 'dgsbjtCd'
-    #     value = code
-    #     print(f"코드 '{code}'로 검색을 수행합니다.")
-    # else:
-    #     param = 'yadmNm'
-    #     value = input_value
-    #     print(f"병원 이름 '{input_value}'로 검색을 수행합니다.")
     if code and input_value.strip() in hospital_types:
         param = 'dgsbjtCd'
         value = code
@@ -203,25 +194,6 @@ def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: in
         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
     
     baseUrl = 'http://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
-    # queryParams = f'?ServiceKey={pubapi_key}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
-    # fullUrl = baseUrl + queryParams
-    # # API 요청 (API 키가 필요함)
-    # response = requests.get(fullUrl)
-    # data = response.json()
-    # body_data = data['response']['body']['items']['item']
-    # # 성공적으로 데이터를 받았을 때의 처리 로직
-    # return body_data
-    # fullUrl = baseUrl + queryParams
-    # response = requests.get(fullUrl)
-    # data = response.json()
-    # totalCount = data['response']['body']['totalCount']
-    # totalCount 값을 사용하여 numOfRows 설정
-    # if code and input_value.strip() in hospital_types:
-    #     radius = set_search_radius(xPos, yPos, under)  # radius 값 재설정
-    #     queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&numOfRows={totalCount}&_type=json'
-    # else:
-    #     queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&numOfRows={totalCount}&_type=json'
-    
     fullUrl = baseUrl + queryParams
     response = requests.get(fullUrl)
     data = response.json()
@@ -233,15 +205,25 @@ def paginationforinstitute(data: List[Dict[str, Any]], page_number, total_record
     pagination = Paginations(total_records=total_records, current_page=page_number, records_per_page=records_per_page)
     return data, pagination
 
-# def paginationforinstitute(data: List[Dict[str, Any]], page_number, records_per_page=10) -> (List[Dict[str, Any]], Paginations):
-#     total_records = len(data)
-#     pagination = Paginations(total_records=total_records, current_page=page_number, records_per_page=records_per_page)
+async def get_excellent_hospital_info(ykiho: str):
+    """
+    각 병원별 고유 번호(ykiho)를 사용하여 우수 병원 정보를 조회하는 함수입니다.
+    """
+    ykiho = ykiho.strip("'")  #
+    url = f"http://apis.data.go.kr/B551182/exclInstHospAsmInfoService/getExclInstHospAsmInfo?ServiceKey={pubapi_key}&pageNo=1&numOfRows=23&ykiho={ykiho}&_type=json"
+    response = requests.get(url)
+    ydata = response.json()
+    pass
+    if ydata['response']['body']['items'] == '':
+        return None  # 평가 항목이 없는 경우
 
-#     start_index = (page_number - 1) * records_per_page
-#     end_index = start_index + records_per_page
-#     page_data = data[start_index:end_index]
+    items = ydata['response']['body']['items']['item']
+    if isinstance(items, dict):  # 단일 항목인 경우 리스트로 변환
+        items = [items]
 
-#     return page_data, pagination
+    return items
+
+
 #### -------------------------------------------------------------------------------------------------------
 
 # 희귀질환정보검색
@@ -374,13 +356,22 @@ async def search_hospital(
             sorted_data_list = sorted(body_data, key=lambda x: safe_float_convert(x.get('distance', float('inf'))))
             extracted_data = []
             for hospital in sorted_data_list:
+                ykiho = hospital['ykiho']
+                excellent_info = await get_excellent_hospital_info(ykiho)
+                if excellent_info:
+                    excellent_info_extracted = [{'asmGrdNm': item['asmGrdNm'], 'asmNm': item['asmNm']} for item in excellent_info]
+                    hospital['excellent_info'] = excellent_info_extracted
+                else:
+                    hospital['excellent_info'] = "없음"
+                    
                 extracted_data.append({
                     'addr': hospital['addr'],
                     'yadmNm': hospital['yadmNm'],
                     'telno': hospital['telno'],
                     'XPos': hospital['XPos'],
                     'YPos': hospital['YPos'],
-                    'ykiho': hospital['ykiho']
+                    'ykiho': hospital['ykiho'],
+                    'excellent_info': hospital['excellent_info']
                 })
             page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
             return templates.TemplateResponse(

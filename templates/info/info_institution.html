@@ -1,6 +1,32 @@
 {% extends "maintemplate.html" %}
 
 {% block main_container %}
+<style>
+  .name {
+    max-width: 250px;
+    /* 최대 너비 설정 */
+    word-wrap: break-word;
+    /* 길이가 최대 너비를 넘어가면 줄바꿈 */
+  }
+
+  .address {
+    max-width: 450px;
+    /* 최대 너비 설정 */
+    word-wrap: break-word;
+    /* 길이가 최대 너비를 넘어가면 줄바꿈 */
+  }
+
+  .excellent-info {
+    display: none;
+    /* 기본적으로 우수 정보를 숨김 */
+  }
+  
+  .td {
+  text-align: center;
+  }
+
+</style>
+
 
 <form action="" id="maps" class="container" method="get">
   <div class="container">
@@ -16,22 +42,39 @@
           <table id="places">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Tel Num</th>
-                <th>자세히 보기</th>
+                <th class="td">Name</th>
+                <th class="td">Address</th>
+                <th class="td">Tel Num</th>
+                <th class="td">자세히 보기</th>
               </tr>
             </thead>
-            <tbody id="tbody"></tbody>
-            {% for result in results %}
-            <tr>
-              <td>{{result.yadmNm}}</td>
-              <td>{{result.addr}}</td>
-              <td>{{result.telno}}</td>
-              <td><a href="#" onclick="focusOnMap({{index}}); return false;" data-result-id="{{result.ykiho}}">보기</a>
-              </td>
-            </tr>
-            {% endfor %}
+            <tbody id="tbody">
+              {% for result in results %}
+              <tr>
+                <td class="name">{{result.yadmNm}}</td>
+                <td class="address">{{result.addr}}</td>
+                <td class="td">{{result.telno}}</td>
+                <td class="td"><a href="#" onclick="focusOnMap({{index}}); return false;" data-result-id="{{result.ykiho}}">보기</a>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <div onclick="toggleExcellentInfo({{loop.index0}});" style="cursor: pointer;">병원평가</div>
+                  {% if result.excellent_info != "없음" %}
+                  <div id="excellent-info-{{loop.index0}}" class="excellent-info" style="display: none;">
+                    <ul>
+                      {% for info in result.excellent_info %}
+                      <li>{{ info.asmGrdNm }} - {{ info.asmNm }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  {% else %}
+                  <div id="excellent-info-{{loop.index0}}" class="excellent-info" style="display: none;">우수 정보 없음</div>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
           <div>
             {% if results==[] %}
@@ -241,11 +284,30 @@
     }
   }
 
+  function toggleExcellentInfo(index) {
+    var infoElement = document.getElementById('excellent-info-' + index);
+    if (infoElement.style.display === 'none') {
+      infoElement.style.display = 'block';
+    } else {
+      infoElement.style.display = 'none';
+    }
+  }
+
   function focusOnMap(index, map) {
     const marker = markers[index]; // 전역 마커 배열에서 마커를 가져옴
     map.setCenter(marker.getPosition());
-    map.setZoom(16); // 확대 수준을 조정할 수 있음
+    map.setZoom(10); // 확대 수준을 조정할 수 있음
   }
+
+  function hideAllExcellentInfo() {
+    var allInfoElements = document.querySelectorAll('.excellent-info');
+    allInfoElements.forEach(function (infoElem) {
+      infoElem.style.display = 'none';
+    });
+  }
+
+  // 페이지 로드 시 hideAllExcellentInfo 함수 실행
+  window.onload = hideAllExcellentInfo;
 
   window.onload = requestUserLocation;
 </script>
