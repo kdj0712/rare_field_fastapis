@@ -1,5 +1,5 @@
 from fastapi import APIRouter, FastAPI, Form, Depends,HTTPException, Request, Query
-from typing import Optional
+from typing import Optional, Any, List, Dict
 import requests
 from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -9,6 +9,7 @@ import httpx
 from dotenv import load_dotenv
 import json
 from sklearn.feature_extraction.text import TfidfVectorizer
+from utils.paginations import Paginations
 from sklearn.metrics.pairwise import cosine_similarity
 from google.cloud import storage
 import pandas as pd
@@ -160,7 +161,7 @@ def search_by_code_or_name(input_value: str):
 def set_search_radius(xPos, yPos, under):
     """
     주어진 사용자의 좌표(xPos, yPos)가 under 딕셔너리에 있는 지역의 좌표로부터 +-0.1 범위 안에 있는 경우,
-    검색 반경을 20000으로 설정하고, 그렇지 않은 경우에는 5000으로 설정합니다.
+    검색 반경을 10000으로 설정하고, 그렇지 않은 경우에는 3000으로 설정합니다.
 
     Parameters:
     xPos (float): 사용자의 X 좌표
@@ -176,7 +177,7 @@ def set_search_radius(xPos, yPos, under):
             return 10000  # 범위 안에 있는 경우
     return 3000  # 범위 안에 있는 지역이 없는 경우
 # 실제 검색 함수
-def search_hospitals(input_value: str, xPos: float, yPos: float):
+def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: int = 1):
     input_value = preprocess_input(input_value)
     code = find_hospital_code(input_value)
     radius = set_search_radius(xPos, yPos,under)
@@ -194,25 +195,53 @@ def search_hospitals(input_value: str, xPos: float, yPos: float):
         value = code
         # 코드로 검색할 경우에만 radius 값을 구합니다.
         radius = set_search_radius(xPos, yPos, under)
-        print(f"코드 '{code}'로 검색을 수행합니다.")
-        queryParams = f'?ServiceKey={pubapi_key}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
+        queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
     else:
         param = 'yadmNm'
         value = input_value
-        print(f"병원 이름 '{input_value}'로 검색을 수행합니다.")
         # 병원 이름으로 검색할 경우에는 radius 파라미터를 추가하지 않습니다.
-        queryParams = f'?ServiceKey={pubapi_key}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
+        queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
     
     baseUrl = 'http://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
     # queryParams = f'?ServiceKey={pubapi_key}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
+    # fullUrl = baseUrl + queryParams
+    # # API 요청 (API 키가 필요함)
+    # response = requests.get(fullUrl)
+    # data = response.json()
+    # body_data = data['response']['body']['items']['item']
+    # # 성공적으로 데이터를 받았을 때의 처리 로직
+    # return body_data
+    # fullUrl = baseUrl + queryParams
+    # response = requests.get(fullUrl)
+    # data = response.json()
+    # totalCount = data['response']['body']['totalCount']
+    # totalCount 값을 사용하여 numOfRows 설정
+    # if code and input_value.strip() in hospital_types:
+    #     radius = set_search_radius(xPos, yPos, under)  # radius 값 재설정
+    #     queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&numOfRows={totalCount}&_type=json'
+    # else:
+    #     queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&numOfRows={totalCount}&_type=json'
+    
     fullUrl = baseUrl + queryParams
-    # API 요청 (API 키가 필요함)
     response = requests.get(fullUrl)
     data = response.json()
     body_data = data['response']['body']['items']['item']
-    # 성공적으로 데이터를 받았을 때의 처리 로직
-    return body_data
-        
+    totalCount = data['response']['body']['totalCount']
+    return body_data,totalCount
+
+def paginationforinstitute(data: List[Dict[str, Any]], page_number, total_records, records_per_page=10) -> (List[Dict[str, Any]], Paginations):
+    pagination = Paginations(total_records=total_records, current_page=page_number, records_per_page=records_per_page)
+    return data, pagination
+
+# def paginationforinstitute(data: List[Dict[str, Any]], page_number, records_per_page=10) -> (List[Dict[str, Any]], Paginations):
+#     total_records = len(data)
+#     pagination = Paginations(total_records=total_records, current_page=page_number, records_per_page=records_per_page)
+
+#     start_index = (page_number - 1) * records_per_page
+#     end_index = start_index + records_per_page
+#     page_data = data[start_index:end_index]
+
+#     return page_data, pagination
 #### -------------------------------------------------------------------------------------------------------
 
 # 희귀질환정보검색
@@ -316,21 +345,23 @@ async def institution(request:Request):
 
 
 #### -------------------------------------------------------------------------------------------------------
-
+# @router.post("/info_institution", response_class=HTMLResponse) 
+@router.get("/info_institution/{page_number}")
 @router.get("/info_institution") 
 async def search_hospital(
     request: Request,
+    page_number: int = 1,
     keyword: Optional[str] = Query(None),
     pos: Optional[str] = Query(None)):  # Pydantic 모델을 이용해 xPos와 yPos를 pos 객체로 받음):
+    await request.form()
+    keyword = request.query_params.get('keyword')
+    pos = request.query_params.get('pos')
     try: 
-        if keyword is None:
-            results = {}
-            return templates.TemplateResponse("info/info_institution.html", {"request": request, "results": results,'API_KEY': api_key})
-        else:
+        if keyword and pos:
             yPos, xPos = pos.split(',')
             yPos = float(yPos)
             xPos = float(xPos)
-            body_data = search_hospitals(keyword,xPos,yPos)
+            body_data,totalCount = search_hospitals(keyword,xPos,yPos,page_number)
             def safe_float_convert(value):
                 try:
                     return float(value)
@@ -351,11 +382,18 @@ async def search_hospital(
                     'YPos': hospital['YPos'],
                     'ykiho': hospital['ykiho']
                 })
-
-            return templates.TemplateResponse("info/info_institution.html", {"request": request, "results": extracted_data,'API_KEY': api_key})
+            page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
+            return templates.TemplateResponse(
+                name="info/info_institution.html",
+                context={"request": request, 'pagination': pagination, "results": page_data, 'API_KEY': api_key})
+        else:
+            # results = []
+            # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
+            return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": [],'API_KEY': api_key})
     except:
-        results = {}
-        return templates.TemplateResponse("info/info_institution.html", {"request": request, "results": results,'API_KEY': api_key})
+        # results = []
+        # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
+        return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [],'API_KEY': api_key})
 
 #### -------------------------------------------------------------------------------------------------------
 
