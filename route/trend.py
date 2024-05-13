@@ -96,7 +96,7 @@ async def trend_news_read_function(
 
 
 # restapi 생성
-@router.post("/trend_news", response_model=Dict[str, List])
+@router.post("/trend_news_data", response_model=Dict[str, List])
 async def get_news_data():
     data_news = await collection_trend_news.get_all()
 
@@ -126,7 +126,7 @@ async def trend_law(request:Request):
 
 
 # restapi 생성
-@router.post("/trend_law", response_model=Dict[str, List])
+@router.post("/trend_law_data", response_model=Dict[str, List])
 async def get_law_data():
     data_law = await collection_trend_law.get_all()
 
@@ -166,7 +166,7 @@ async def trend_guideline_read_func(
     )
 
 # restapi 생성
-@router.post("/trend_guideline", response_model=Dict[str, List])
+@router.post("/trend_guideline_data", response_model=Dict[str, List])
 async def get_guideline_data():
     data_guideline = await collection_trend_guideline.get_all()
 
@@ -216,7 +216,7 @@ async def trend_site(request:Request):
     return templates.TemplateResponse(name="trend/trend_site.html", context={'request':request})
 
 # restapi 생성
-@router.post("/trend_site", response_model=Dict[str, List])
+@router.post("/trend_site_data", response_model=Dict[str, List])
 async def get_site_data():
     data_site = await collection_trend_site.get_all()
 
