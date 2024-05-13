@@ -1,0 +1,11 @@
+def codes(x):
+    condition = (df_cate["질환코드"] == x[0]) &\
+           (float(x[1:]) >= df_cate["코드시작"].astype(float)) &\
+           (float(x[1:]) <= df_cate["코드끝"].astype(float))
+    result = df_cate.loc[condition, '항목분류']
+    if len(result) > 0:
+        return result.iloc[0]
+    else:
+        return None 
+
+df_insurance['항목분류'] = df_insurance['희귀질환 상병코드'].apply(codes)
