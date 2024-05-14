@@ -12,6 +12,8 @@ from models.trend_site import trend_site
 
 from models.trend_news import news_trends # mongodb 추가해서 넣어야 함
 
+from typing import List, Dict
+
 collection_trend_news= Database(news_trends)
 collection_trend_guideline= Database(trend_guideline)
 collection_trend_documents= Database(trend_documents)
@@ -21,6 +23,7 @@ collection_trend_site= Database(trend_site)
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates/")
+
 
 #### -------------------------------------------------------------------------------------------------------
 
@@ -66,32 +69,6 @@ async def trend_news(
         name="trend/trend_news.html", 
         context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category, 'search_word' : search_word})
 
-# @router.post("/trend_news", response_class=HTMLResponse) 
-# async def trend_news_post(
-#     request: Request,
-#     page_number: Optional[int] = 1,
-#     key_name: Optional[str] = Query(None),
-#     search_word: Optional[str] = Query(None),
-#     category: Optional[str] = Query(None)  # 카테고리 정보를 쿼리 파라미터로 받음
-# ):
-#     await request.form()
-    
-#     conditions = {}
-    
-#     if category:  # 만약 카테고리가 전달되면 해당 카테고리에 맞게 필터링
-#         conditions['news_topic'] = category
-        
-#     news_list, pagination = await collection_trend_news.gbcwp_reverse_date(
-#         conditions, page_number
-#     )
-    
-#     return templates.TemplateResponse(
-#         name="trend/trend_news.html", 
-#         context={'request': request, 'pagination': pagination, 'news': news_list, 'selected_category': category}
-#     )
-    
-# news_read
-
 @router.get("/trend_news_read/{object_id}", response_class=HTMLResponse)
 async def trend_news_read_function(
     request: Request, 
@@ -116,7 +93,18 @@ async def trend_news_read_function(
         name="trend/trend_news.html",
         context={"request": request}
     )
-    
+
+
+# restapi 생성
+@router.post("/trend_news_data", response_model=Dict[str, List])
+async def get_news_data():
+    data_news = await collection_trend_news.get_all()
+
+    # 모든 결과를 하나의 json 형태로 변환
+    return {
+        "data_news" : data_news
+    }
+
 #### -------------------------------------------------------------------------------------------------------
 
 # 법, 시행령, 시행규칙
@@ -135,6 +123,17 @@ async def trend_law(request:Request,
 @router.post("/trend_law", response_class=HTMLResponse) 
 async def trend_law(request:Request):
     return templates.TemplateResponse(name="trend/trend_law.html", context={'request':request})
+
+
+# restapi 생성
+@router.post("/trend_law_data", response_model=Dict[str, List])
+async def get_law_data():
+    data_law = await collection_trend_law.get_all()
+
+    # 모든 결과를 하나의 json 형태로 변환
+    return {
+        "trend_law" : data_law
+    }
 
 #### -------------------------------------------------------------------------------------------------------
 
@@ -165,6 +164,16 @@ async def trend_guideline_read_func(
         name="trend/trend_guideline_read.html"
         , context={"request" : request, "guidelines" : guideline}
     )
+
+# restapi 생성
+@router.post("/trend_guideline_data", response_model=Dict[str, List])
+async def get_guideline_data():
+    data_guideline = await collection_trend_guideline.get_all()
+
+    # 모든 결과를 하나의 json 형태로 변환
+    return {
+        "trend_guideline" : data_guideline
+    }
 
 
 #### -------------------------------------------------------------------------------------------------------
@@ -205,3 +214,13 @@ async def trend_site(
 @router.post("/trend_site", response_class=HTMLResponse) 
 async def trend_site(request:Request):
     return templates.TemplateResponse(name="trend/trend_site.html", context={'request':request})
+
+# restapi 생성
+@router.post("/trend_site_data", response_model=Dict[str, List])
+async def get_site_data():
+    data_site = await collection_trend_site.get_all()
+
+    # 모든 결과를 하나의 json 형태로 변환
+    return {
+        "trend_site" : data_site
+    }
