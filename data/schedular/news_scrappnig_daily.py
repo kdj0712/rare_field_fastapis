@@ -137,47 +137,46 @@ def thevoicescrapping(browser_name, keyword) :
     time.sleep(2)
     
     # 스크래핑
-    while True :
-        contents = browser.find_elements(By.CSS_SELECTOR,"div.article-list > section > div")
-        for index in range(len(contents)):
-            try :
-                news_title = browser.find_element(By.CSS_SELECTOR, "div.article-list > section > div > div.list-titles > a").text
-                news_url = contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a").get_attribute("href")
-            except NoSuchElementException :
-                pass
-            try : 
-                # contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a > strong").click()
-                link_element = contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a")
-                link_url = link_element.get_attribute("href")
-                browser.execute_script(f"window.open('{link_url}', '_blank');")
-                new_tab = browser.window_handles[-1]
-                browser.switch_to.window(new_tab)
-                # 페이지 안에서 구하기
-                news_datetime_first = browser.find_element(By.CSS_SELECTOR, "section > div > ul > li:nth-child(2)").text
-                date_str = news_datetime_first.split()[1]
-                news_datetime = datetime.strptime(date_str, '%Y.%m.%d')
-                try : 
-                    news_image = browser.find_element(By.CSS_SELECTOR, "#article-view-content-div > div > figure > img").get_attribute('src')
-                except NoSuchElementException :
-                    news_image = ''
-                news_contents =''
-                news_contents_p = browser.find_elements(By.CSS_SELECTOR, "#article-view-content-div > p")
-                for news_p in news_contents_p:
-                    news_contents += f'<p>{news_p.text}</p>'
-            except NoSuchElementException:
-                news_title = 'none'
-                news_datetime = 'none'
-                news_contents = 'none'
-            thevoice_news_all.insert_one({"news_title" : news_title
-                                        , "news_datetime" : news_datetime
-                                        ,"news_contents":news_contents
-                                        ,"news_url":news_url
-                                        , "news_image" : news_image
-                                        ,'news_paper' : "뉴스더보이스" })
-            browser.close()
-            time.sleep(1)
+    contents = browser.find_elements(By.CSS_SELECTOR,"div.article-list > section > div")
+    for index in range(len(contents)):
+        try :
+            news_title = browser.find_element(By.CSS_SELECTOR, "div.article-list > section > div > div.list-titles > a").text
+            news_url = contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a").get_attribute("href")
+        except NoSuchElementException :
+            pass
+        try : 
+            # contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a > strong").click()
+            link_element = contents[index].find_element(By.CSS_SELECTOR, "div > div.list-titles > a")
+            link_url = link_element.get_attribute("href")
+            browser.execute_script(f"window.open('{link_url}', '_blank');")
             new_tab = browser.window_handles[-1]
             browser.switch_to.window(new_tab)
+            # 페이지 안에서 구하기
+            news_datetime_first = browser.find_element(By.CSS_SELECTOR, "section > div > ul > li:nth-child(2)").text
+            date_str = news_datetime_first.split()[1]
+            news_datetime = datetime.strptime(date_str, '%Y.%m.%d')
+            try : 
+                news_image = browser.find_element(By.CSS_SELECTOR, "#article-view-content-div > div > figure > img").get_attribute('src')
+            except NoSuchElementException :
+                news_image = ''
+            news_contents =''
+            news_contents_p = browser.find_elements(By.CSS_SELECTOR, "#article-view-content-div > p")
+            for news_p in news_contents_p:
+                news_contents += f'<p>{news_p.text}</p>'
+        except NoSuchElementException:
+            news_title = 'none'
+            news_datetime = 'none'
+            news_contents = 'none'
+        thevoice_news_all.insert_one({"news_title" : news_title
+                                    , "news_datetime" : news_datetime
+                                    ,"news_contents":news_contents
+                                    ,"news_url":news_url
+                                    , "news_image" : news_image
+                                    ,'news_paper' : "뉴스더보이스" })
+        browser.close()
+        time.sleep(1)
+        new_tab = browser.window_handles[-1]
+        browser.switch_to.window(new_tab)
     return
 
 # bosascrapping("http://www.bosa.co.kr/", "희귀질환")
