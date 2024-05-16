@@ -10,7 +10,6 @@ class news_trends(Document):
     news_url : Optional[str] = None
     news_topic : Optional[str] = None
     news_paper : Optional[str] = None
-    news_clicks : Optional[int] = None
     news_image : Optional[str] = None
 
     class Settings:
