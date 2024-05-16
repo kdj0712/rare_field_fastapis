@@ -22,9 +22,9 @@ def tokenizer(raw, pos=['Noun', 'Verb']):
     ]
     
 
-def update_news_trend_collection():
-    news_weekly_collection = dbconnect("teamkim", "news_weekly")
-    news_collection = dbconnect("teamkim", "trend_news_test")
+def update_news_trend_collection(collection_name):
+    news_weekly_collection = dbconnect("teamkim", collection_name)
+    news_collection = dbconnect("teamkim", "trend_news")
     
     # daily 에 있는 내용 가지고 오기
     cursor = news_weekly_collection.find({})
@@ -49,5 +49,6 @@ def update_news_trend_collection():
     # news_trend_collection에 내용 추가하기
 
 if __name__ == "__main__" :
-    update_news_trend_collection()
+    update_news_trend_collection("news_weekly") #bosa
+    update_news_trend_collection("news_weekly_thevoice") #thevoice
     pass

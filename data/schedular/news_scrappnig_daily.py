@@ -114,7 +114,7 @@ def thevoicescrapping(browser_name, keyword) :
     thevoice_news_all = dbconnect('news_weekly_thevoice')
     
     # 실제 사용할 때 꼭 지울 것
-    thevoice_news_all.delete_many({})
+    # thevoice_news_all.delete_many({})
 
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  # Ensure GUI is off
@@ -152,7 +152,7 @@ def thevoicescrapping(browser_name, keyword) :
             new_tab = browser.window_handles[-1]
             browser.switch_to.window(new_tab)
             # 페이지 안에서 구하기
-            news_datetime_first = browser.find_element(By.CSS_SELECTOR, "section > div > ul > li:nth-child(2)")[0].text
+            news_datetime_first = browser.find_element(By.CSS_SELECTOR, "section > div > ul > li:nth-child(2)").text
             date_str = news_datetime_first.split()[1]
             news_datetime = datetime.strptime(date_str, '%Y.%m.%d')
             try : 
@@ -172,9 +172,11 @@ def thevoicescrapping(browser_name, keyword) :
                                     ,"news_contents":news_contents
                                     ,"news_url":news_url
                                     , "news_image" : news_image
-                                     ,'news_paper' : "뉴스더보이스" })
+                                    ,'news_paper' : "뉴스더보이스" })
         browser.close()
         time.sleep(1)
+        new_tab = browser.window_handles[-1]
+        browser.switch_to.window(new_tab)
     return
 
 # bosascrapping("http://www.bosa.co.kr/", "희귀질환")
