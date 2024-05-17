@@ -58,7 +58,31 @@ class Paginations:
     
     def _calculate_start_record_number(self):
         # 현재 페이지 번호와 페이지 당 레코드 수를 곱한 후 페이지 당 레코드 수를 빼고 1을 더하여 현재 페이지의 시작 레코드 번호를 계산
-        return (self.current_page * self.records_per_page) - self.records_per_page + 1    
+        return (self.current_page * self.records_per_page) - self.records_per_page + 1    \
+        
+    # restapi 를 만들기 위해 Pagination 객체의 속성을 딕셔너리로 변환
+    def to_dict(self):
+        return {
+            "records_per_page": self.records_per_page,
+            "pages_per_block": self.pages_per_block,
+            "total_records": self.total_records,
+            "current_page": self.current_page,
+            "total_pages": self.total_pages,
+            "total_blocks": self.total_blocks,
+            "current_block": self.current_block,
+            "start_page": self.start_page,
+            "end_page": self.end_page,
+            "start_record_number": self.start_record_number,
+            "current_page_range": list(self.current_page_range),
+            "previous_page": self.previous_page,
+            "has_previous_page": self.has_previous_page,
+            "next_page": self.next_page,
+            "has_next_page": self.has_next_page,
+            "first_page": self.first_page,
+            "has_previous_block": self.has_previous_block,
+            "last_page": self.last_page,
+            "has_next_block": self.has_next_block
+        }
 
 if __name__ == "__main__":
     # 예시 사용:
