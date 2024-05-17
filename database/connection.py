@@ -153,6 +153,7 @@ class Database:
         if documents:
             return documents, pagination
         return documents, pagination
+
     async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
         total = await self.model.find(conditions).count()
         pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
