@@ -20,7 +20,7 @@ database = mongoClient["data_analysis"]
 collection = database['diverse_visitkorea']
 
 # - 주소 입력
-url = "https://play.google.com/store/apps/details?id=com.visitkorea.kr&pli=1"
+url = "https://play.google.com/store/apps/details?id=kr.carenation.caregiver"
 browser.get(url)
 time.sleep(2)
 
