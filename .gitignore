@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+data/data_analysis/csv/navercafe_concat_lists_dj.csv
 # C extensions
 *.so
 
