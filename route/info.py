@@ -452,3 +452,47 @@ async def paper_list_pub(
             name="/info/info_academicinfo_pubmed.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
 
+##### -------------------------------------------------------------------------------------------------------
+# rest api info_raredisease
+
+@router.post("/raredisease", response_class=HTMLResponse) 
+async def disease_list(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    
+    await request.form()
+    
+    conditions = {}
+    
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if key_name and search_word:
+        if key_name == 'dise_name_kr':
+            conditions.update({ 'dise_name_kr': { '$regex': search_word }})
+        elif key_name == 'dise_KCD_code':
+            conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
+        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+            range_start, range_end = search_word.split('-')
+            if range_start != '코드 없음':
+                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+            else:
+                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+        elif key_name == 'dise_spc_code':
+            conditions.update({ 'dise_spc_code': { '$regex': search_word }})
+        elif key_name == 'dise_symptoms':
+            similar_diseases_names = predict_disease(search_word)
+            conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
+
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return templates.TemplateResponse(
+            context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
+
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+
+        return templates.TemplateResponse(
+            context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
+
