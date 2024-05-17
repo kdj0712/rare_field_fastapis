@@ -455,7 +455,7 @@ async def paper_list_pub(
 ##### -------------------------------------------------------------------------------------------------------
 # rest api info_raredisease
 
-@router.post("/info_raredisease", response_class=HTMLResponse) 
+@router.post("/raredisease", response_class=HTMLResponse) 
 async def disease_list(
     request: Request,
     page_number: int = 1,
@@ -488,13 +488,11 @@ async def disease_list(
 
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return templates.TemplateResponse(
-            name="/info/info_raredisease.html",
             context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
 
     else: # key_name이 없을 경우 모든 질환의 리스트를 출력
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
 
         return templates.TemplateResponse(
-            name="/info/info_raredisease.html",
             context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
 
