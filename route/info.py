@@ -377,7 +377,6 @@ async def raredisease_list(
 
 
 #### -------------------------------------------------------------------------------------------------------
-# @router.post("/info_institution", response_class=HTMLResponse) 
 @router.get("/info_institution/{page_number}")
 @router.get("/info_institution") 
 async def search_hospital(
@@ -435,6 +434,59 @@ async def search_hospital(
         # results = []
         # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
         return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [],'API_KEY': api_key})
+
+@router.post("/institution/{page_number}")
+@router.post("/institution") 
+async def search_hospital(
+    request: Request,
+    page_number: int = 1,
+    keyword: Optional[str] = Query(None),
+    pos: Optional[str] = Query(None)):  # Pydantic 모델을 이용해 xPos와 yPos를 pos 객체로 받음):
+    await request.form()
+    keyword = request.query_params.get('keyword')
+    pos = request.query_params.get('pos')
+    try: 
+        if keyword and pos:
+            yPos, xPos = pos.split(',')
+            yPos = float(yPos)
+            xPos = float(xPos)
+            body_data,totalCount = search_hospitals(keyword,xPos,yPos,page_number)
+            def safe_float_convert(value):
+                try:
+                    return float(value)
+                except ValueError:
+                    return float('inf')
+            if isinstance(body_data, dict):
+                body_data = [body_data]
+            elif not isinstance(body_data, list):
+                body_data = [] 
+            sorted_data_list = sorted(body_data, key=lambda x: safe_float_convert(x.get('distance', float('inf'))))
+            extracted_data = []
+            for hospital in sorted_data_list:
+                ykiho = hospital['ykiho']
+                excellent_info = await get_excellent_hospital_info(ykiho)
+                if excellent_info:
+                    excellent_info_extracted = [{'asmGrdNm': item['asmGrdNm'], 'asmNm': item['asmNm']} for item in excellent_info]
+                    hospital['excellent_info'] = excellent_info_extracted
+                else:
+                    hospital['excellent_info'] = "없음"
+                    
+                extracted_data.append({
+                    'addr': hospital['addr'],
+                    'yadmNm': hospital['yadmNm'],
+                    'telno': hospital['telno'],
+                    'XPos': hospital['XPos'],
+                    'YPos': hospital['YPos'],
+                    'ykiho': hospital['ykiho'],
+                    'excellent_info': hospital['excellent_info']
+                })
+            page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
+            return {'pagination': pagination.to_dict(), "results": page_data, 'API_KEY': api_key}
+        else:
+            return {'pagination': None, "results": [],'API_KEY': api_key}
+    except:
+        return {'pagination': None, "results": [],'API_KEY': api_key}
+
 
 #### -------------------------------------------------------------------------------------------------------
 
