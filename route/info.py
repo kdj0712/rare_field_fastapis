@@ -356,11 +356,11 @@ class diseases(BaseModel):
 #     raise TypeError
 
 
-
+@router.post("/raredisease/{page_number}")
 @router.post("/raredisease") 
 async def raredisease_list(
     request: Request,
-    page_number: Optional[int] = Query(1),
+    page_number: int = 1,
     key_name: Optional[str] = Query(None),
     search_word: Optional[str] = Query(None)
     ):
@@ -384,8 +384,8 @@ async def raredisease_list(
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}, custom_encoder=custom_json_encoder)
-        return encoded
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
+        # return encoded
     elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
         range_start, range_end = search_word.split('-')
         if range_start != '코드 없음':
@@ -395,13 +395,14 @@ async def raredisease_list(
             
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         # pagination_dict = pagination.to_dict()
-        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}, custom_encoder=custom_json_encoder)
-        return encoded
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
+        # return encoded
 
     elif key_name==None: # key_name이 없을 경우 모든 질환의 리스트를 출력
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict()}, custom_encoder=custom_json_encoder)
-        return encoded
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict()}
+        # encoded = jsonable_encoder({'dise_list': dise_list, 'pagination': pagination.to_dict()}, custom_encoder=custom_json_encoder)
+        # return encoded
  
 
 
