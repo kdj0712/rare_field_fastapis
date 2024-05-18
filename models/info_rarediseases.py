@@ -4,6 +4,7 @@ from beanie import Document, Link
 from pydantic import BaseModel, EmailStr
 
 class diseases(Document):
+    dise_id : Optional[str] = None
     dise_KCD_code : Optional[str] = None
     dise_spc_code : Optional[str] = None
     dise_group : Optional[str] = None

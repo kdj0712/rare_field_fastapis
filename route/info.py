@@ -1,23 +1,22 @@
 from fastapi import APIRouter, FastAPI, Form, Depends,HTTPException, Request, Query
 from typing import Optional, Any, List, Dict
-import requests
-from fastapi.encoders import jsonable_encoder
-from bson import ObjectId
-from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import HTMLResponse
 from aiohttp import ClientSession
 from pydantic import BaseModel
-import httpx
 from dotenv import load_dotenv
-import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils.paginations import Paginations
 from sklearn.metrics.pairwise import cosine_similarity
 from google.cloud import storage
 import pandas as pd
+import requests
 import pickle
-load_dotenv()
 import os
+import sys
+
+load_dotenv()
 pubapi_key = os.getenv("PUBLIC_API_KEY")
 api_key = os.getenv("API_KEY")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/app/teamKim/macro-atom-415806-fd4035d471e1.json"
@@ -293,18 +292,23 @@ async def disease_list(
             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code':
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
-        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
-                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_symptoms':
             similar_diseases_names = predict_disease(search_word)
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return templates.TemplateResponse(
+            name="/info/info_raredisease.html",
+            context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
+
+    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+        range_start, range_end = search_word.split('-')
+        if range_start != '코드 없음':
+            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+        else:
+            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return templates.TemplateResponse(
             name="/info/info_raredisease.html",
@@ -325,38 +329,54 @@ async def institution(request:Request):
 # rest api info_raredisease
 
 
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        return jsonable_encoder(obj)
+# class CustomJSONEncoder(json.JSONEncoder):
+#     def default(self, obj):
+#         if isinstance(obj, ObjectId):
+#             return str(obj)
+#         elif isinstance(obj, BaseModel):
+#             return obj.dict()
+#         return jsonable_encoder(obj)
 
 
-@router.post("/raredisease",response_class=HTMLResponse) 
+class diseases(BaseModel):
+    dise_id : str
+    dise_KCD_code : str
+    dise_spc_code : str
+    dise_group : str
+    dise_name_kr: str
+    dise_name_en: str
+    dise_support: str
+    dise_url : Optional[str] = None
+  
+
+# def custom_json_encoder(obj):
+#     if isinstance(obj, diseases):
+#         return obj.custom_encoder()
+#     # 다른 타입에 대한 처리가 필요하면 여기서 추가
+#     raise TypeError
+
+
+
+@router.post("/raredisease") 
 async def raredisease_list(
     request: Request,
     page_number: Optional[int] = Query(1),
     key_name: Optional[str] = Query(None),
     search_word: Optional[str] = Query(None)
     ):
+    sys.setrecursionlimit(1500)
     
     await request.form()
     
     conditions = {}
     
-    # key_name = request.query_params.get('key_name')
-    # search_word = request.query_params.get('search_word')
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
     if key_name and search_word:
         if key_name == 'dise_name_kr':
             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code':
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
-        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
-                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_symptoms':
@@ -364,14 +384,25 @@ async def raredisease_list(
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        # pagination_gict = pagination.to_dict()
-        
-        return {'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
+        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}, custom_encoder=custom_json_encoder)
+        return encoded
+    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+        range_start, range_end = search_word.split('-')
+        if range_start != '코드 없음':
+            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+        else:
+            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+            
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        # pagination_dict = pagination.to_dict()
+        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}, custom_encoder=custom_json_encoder)
+        return encoded
 
     elif key_name==None: # key_name이 없을 경우 모든 질환의 리스트를 출력
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        return {'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict()}
-
+        encoded = jsonable_encoder({'request': request, 'dise_list': dise_list, 'pagination': pagination.to_dict()}, custom_encoder=custom_json_encoder)
+        return encoded
+ 
 
 
 
