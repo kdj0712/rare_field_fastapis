@@ -247,6 +247,14 @@
     });
 
   }
+  function toggleExcellentInfo(index) {
+    var infoElement = document.getElementById('excellent-info-' + index);
+    if (infoElement.style.display === 'none') {
+      infoElement.style.display = 'block';
+    } else {
+      infoElement.style.display = 'none';
+    }
+  }
 
   // function error() {
   //   var defaultPos = { lat: 37.5665, lng: 126.9780 };
