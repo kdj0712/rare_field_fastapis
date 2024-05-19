@@ -522,6 +522,34 @@ async def paper_list(
         return templates.TemplateResponse(
             name="/info/info_academicinfo.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
+    
+@router.post("/academicinfo/{page_number}")
+@router.post("/academicinfo")
+async def paper_list(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    await request.form()
+    conditions = {}
+
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'research_title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_year': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
+        return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
+
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
+
+        return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination
 
 @router.get("/info_academicinfo_pub_med/{page_number}")
 @router.get("/info_academicinfo_pub_med")
@@ -554,4 +582,32 @@ async def paper_list_pub(
             name="/info/info_academicinfo_pubmed.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
 
+
+@router.post("/academicinfo_pub_med/{page_number}")
+@router.post("/academicinfo_pub_med")
+async def paper_list_pub(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    sys.setrecursionlimit(1500)
+    await request.form()
+    conditions = {}
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_date': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions, page_number)
+        return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
+
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions,page_number)
+
+        return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination
 ##### -------------------------------------------------------------------------------------------------------
