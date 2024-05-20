@@ -20,7 +20,7 @@ database = mongoClient["data_analysis"]
 collection = database['caregive_platform_google']
 
 # - 주소 입력
-url = "https://play.google.com/store/apps/details?id=com.caredoc.caredocplus"
+url = "https://play.google.com/store/apps/details?id=com.unimewo.careclient"
 browser.get(url)
 time.sleep(2)
 
@@ -30,9 +30,9 @@ browser.find_element(by=By.CSS_SELECTOR, value=selector_element).click()
 time.sleep(2)
 
 # 선택 #formFactor_2 > div.kW9Bj > i   //// div.JPdR6b.e5Emjc.CblTmf.ah7Sve.qjTEB > div > div > span:nth-child(2)
-selector_element = "#formFactor_2 > div.kW9Bj > i"
-browser.find_element(by=By.CSS_SELECTOR, value=selector_element).click()
-time.sleep(2)
+# selector_element = "#formFactor_2 > div.kW9Bj > i"
+# browser.find_element(by=By.CSS_SELECTOR, value=selector_element).click()
+# time.sleep(2)
 
 # 전화/태블릿 설정
 # selector_element = "div.JPdR6b.e5Emjc.CblTmf.ah7Sve.qjTEB > div > div > span:nth-child(2)"
@@ -113,7 +113,7 @@ for i in element_bundle_review:
         evaluation = ""
 
     # MongoDB에 저장
-    collection.insert_one({"app_name": "케어닥", "user_score": user_score, "user_date": user_date, "user_comments": user_comments, "evaluation": evaluation})
+    collection.insert_one({"app_name": "좋은케어", "user_score": user_score, "user_date": user_date, "user_comments": user_comments, "evaluation": evaluation})
     #print("app_name:{}, user_score:{}, user_date:{}, user_comments:{}, evaluation:{}".format(database_name, user_score, user_date, user_comments, evaluation))
 
 pass

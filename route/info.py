@@ -1,21 +1,22 @@
-from fastapi import APIRouter, FastAPI, Form, Depends,HTTPException, Request, Query
+from fastapi import APIRouter,Request, Query
 from typing import Optional, Any, List, Dict
-import requests
-from starlette.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import HTMLResponse
 from aiohttp import ClientSession
 from pydantic import BaseModel
-import httpx
 from dotenv import load_dotenv
-import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils.paginations import Paginations
 from sklearn.metrics.pairwise import cosine_similarity
 from google.cloud import storage
 import pandas as pd
+import requests
 import pickle
-load_dotenv()
 import os
+import sys
+
+load_dotenv()
 pubapi_key = os.getenv("PUBLIC_API_KEY")
 api_key = os.getenv("API_KEY")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/app/teamKim/macro-atom-415806-fd4035d471e1.json"
@@ -270,7 +271,7 @@ async def get_excellent_hospital_info(ykiho: str):
 #         return templates.TemplateResponse(
 #             name="/info/info_raredisease.html",
 #             context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
-@router.post("/info_raredisease", response_class=HTMLResponse) 
+# @router.post("/info_raredisease", response_class=HTMLResponse) 
 @router.get("/info_raredisease/{page_number}")
 @router.get("/info_raredisease")
 async def disease_list(
@@ -291,18 +292,23 @@ async def disease_list(
             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code':
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
-        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
-                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_symptoms':
             similar_diseases_names = predict_disease(search_word)
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return templates.TemplateResponse(
+            name="/info/info_raredisease.html",
+            context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
+
+    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+        range_start, range_end = search_word.split('-')
+        if range_start != '코드 없음':
+            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+        else:
+            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return templates.TemplateResponse(
             name="/info/info_raredisease.html",
@@ -320,6 +326,50 @@ async def institution(request:Request):
     return templates.TemplateResponse(name="info/info_raredisease_nondata.html", context={'request':request})
 
 
+# rest api info_raredisease
+
+@router.post("/raredisease/{page_number}")
+@router.post("/raredisease") 
+async def raredisease_list(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    sys.setrecursionlimit(1500)
+    
+    await request.form()
+    
+    conditions = {}
+    
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if key_name and search_word:
+        if key_name == 'dise_name_kr':
+            conditions.update({ 'dise_name_kr': { '$regex': search_word }})
+        elif key_name == 'dise_KCD_code':
+            conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
+        elif key_name == 'dise_spc_code':
+            conditions.update({ 'dise_spc_code': { '$regex': search_word }})
+        elif key_name == 'dise_symptoms':
+            similar_diseases_names = predict_disease(search_word)
+            conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
+
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
+    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+        range_start, range_end = search_word.split('-')
+        if range_start != '코드 없음':
+            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+        else:
+            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+            
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
+
+    elif key_name==None: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        return {'dise_list': dise_list, 'pagination': pagination.to_dict()}
 
 
 
@@ -327,7 +377,6 @@ async def institution(request:Request):
 
 
 #### -------------------------------------------------------------------------------------------------------
-# @router.post("/info_institution", response_class=HTMLResponse) 
 @router.get("/info_institution/{page_number}")
 @router.get("/info_institution") 
 async def search_hospital(
@@ -386,6 +435,59 @@ async def search_hospital(
         # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
         return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [],'API_KEY': api_key})
 
+@router.post("/institution/{page_number}")
+@router.post("/institution") 
+async def search_hospital(
+    request: Request,
+    page_number: int = 1,
+    keyword: Optional[str] = Query(None),
+    pos: Optional[str] = Query(None)):  # Pydantic 모델을 이용해 xPos와 yPos를 pos 객체로 받음):
+    await request.form()
+    keyword = request.query_params.get('keyword')
+    pos = request.query_params.get('pos')
+    try: 
+        if keyword and pos:
+            yPos, xPos = pos.split(',')
+            yPos = float(yPos)
+            xPos = float(xPos)
+            body_data,totalCount = search_hospitals(keyword,xPos,yPos,page_number)
+            def safe_float_convert(value):
+                try:
+                    return float(value)
+                except ValueError:
+                    return float('inf')
+            if isinstance(body_data, dict):
+                body_data = [body_data]
+            elif not isinstance(body_data, list):
+                body_data = [] 
+            sorted_data_list = sorted(body_data, key=lambda x: safe_float_convert(x.get('distance', float('inf'))))
+            extracted_data = []
+            for hospital in sorted_data_list:
+                ykiho = hospital['ykiho']
+                excellent_info = await get_excellent_hospital_info(ykiho)
+                if excellent_info:
+                    excellent_info_extracted = [{'asmGrdNm': item['asmGrdNm'], 'asmNm': item['asmNm']} for item in excellent_info]
+                    hospital['excellent_info'] = excellent_info_extracted
+                else:
+                    hospital['excellent_info'] = "없음"
+                    
+                extracted_data.append({
+                    'addr': hospital['addr'],
+                    'yadmNm': hospital['yadmNm'],
+                    'telno': hospital['telno'],
+                    'XPos': hospital['XPos'],
+                    'YPos': hospital['YPos'],
+                    'ykiho': hospital['ykiho'],
+                    'excellent_info': hospital['excellent_info']
+                })
+            page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
+            return {'pagination': pagination.to_dict(), "results": page_data, 'API_KEY': api_key}
+        else:
+            return {'pagination': None, "results": [],'API_KEY': api_key}
+    except:
+        return {'pagination': None, "results": [],'API_KEY': api_key}
+
+
 #### -------------------------------------------------------------------------------------------------------
 
 # 학술정보
@@ -420,6 +522,34 @@ async def paper_list(
         return templates.TemplateResponse(
             name="/info/info_academicinfo.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
+    
+@router.post("/academicinfo/{page_number}")
+@router.post("/academicinfo")
+async def paper_list(
+    request: Request,
+    page_number: int = 1,
+    key_name: Optional[str] = Query(None),
+    search_word: Optional[str] = Query(None)
+    ):
+    await request.form()
+    conditions = {}
+
+    key_name = request.query_params.get('key_name')
+    search_word = request.query_params.get('search_word')
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'research_title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_year': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
+        return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
+
+    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+        paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
+
+        return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination
 
 @router.get("/info_academicinfo_pub_med/{page_number}")
 @router.get("/info_academicinfo_pub_med")
@@ -452,47 +582,32 @@ async def paper_list_pub(
             name="/info/info_academicinfo_pubmed.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
 
-##### -------------------------------------------------------------------------------------------------------
-# rest api info_raredisease
 
-@router.post("/raredisease", response_class=HTMLResponse) 
-async def disease_list(
+@router.post("/academicinfo_pub_med/{page_number}")
+@router.post("/academicinfo_pub_med")
+async def paper_list_pub(
     request: Request,
     page_number: int = 1,
     key_name: Optional[str] = Query(None),
     search_word: Optional[str] = Query(None)
     ):
-    
+    sys.setrecursionlimit(1500)
     await request.form()
-    
     conditions = {}
-    
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
-    if key_name and search_word:
-        if key_name == 'dise_name_kr':
-            conditions.update({ 'dise_name_kr': { '$regex': search_word }})
-        elif key_name == 'dise_KCD_code':
-            conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
-        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
-                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
-        elif key_name == 'dise_spc_code':
-            conditions.update({ 'dise_spc_code': { '$regex': search_word }})
-        elif key_name == 'dise_symptoms':
-            similar_diseases_names = predict_disease(search_word)
-            conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
-
-        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        return templates.TemplateResponse(
-            context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
+    if search_word:
+        if key_name == 'thesis_name':
+            conditions.update({ 'title': { '$regex': search_word }})
+        elif key_name == 'thesis_date':
+            search_word = int(search_word)
+            conditions.update({ 'research_date': { '$eq': search_word }})
+        pass
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions, page_number)
+        return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
 
     else: # key_name이 없을 경우 모든 질환의 리스트를 출력
-        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
+        paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions,page_number)
 
-        return templates.TemplateResponse(
-            context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
-
+        return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination
+##### -------------------------------------------------------------------------------------------------------
