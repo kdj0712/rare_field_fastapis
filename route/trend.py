@@ -138,6 +138,19 @@ async def get_news_data(
         , 'selected_category' : category, 'search_word' : search_word
     }
 
+
+
+@router.get("/trend_news_data/{object_id}")
+async def trend_news_read_function(
+    request: Request, 
+    object_id:PydanticObjectId
+    ):
+    
+    news = await collection_trend_news.get(object_id)
+
+    return {"news": news}
+        
+
 #### -------------------------------------------------------------------------------------------------------
 
 # 법, 시행령, 시행규칙
