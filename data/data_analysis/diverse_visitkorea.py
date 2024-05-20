@@ -20,7 +20,7 @@ database = mongoClient["data_analysis"]
 collection = database['caregive_platform_google']
 
 # - 주소 입력
-url = "https://play.google.com/store/apps/details?id=com.system.dasomsystem"
+url = "https://play.google.com/store/apps/details?id=com.unimewo.careclient"
 browser.get(url)
 time.sleep(2)
 
@@ -113,7 +113,7 @@ for i in element_bundle_review:
         evaluation = ""
 
     # MongoDB에 저장
-    collection.insert_one({"app_name": "헬로우케어", "user_score": user_score, "user_date": user_date, "user_comments": user_comments, "evaluation": evaluation})
+    collection.insert_one({"app_name": "좋은케어", "user_score": user_score, "user_date": user_date, "user_comments": user_comments, "evaluation": evaluation})
     #print("app_name:{}, user_score:{}, user_date:{}, user_comments:{}, evaluation:{}".format(database_name, user_score, user_date, user_comments, evaluation))
 
 pass
