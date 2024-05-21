@@ -236,16 +236,6 @@
       handleLocationError(false, infowindow, map.getCenter());
     }
 
-    // 병원 위치를 마커로 지도에 추가하는 부분
-    // 'hospitals' 배열에 병원 데이터가 있다고 가정
-    hospitals.forEach(function (hospital) {
-      var marker = new google.maps.Marker({
-        position: { lat: parseFloat(hospital.YPos), lng: parseFloat(hospital.XPos) },
-        map: map,
-        title: hospital.yadmNm
-      });
-    });
-
   }
   function toggleExcellentInfo(index) {
     var infoElement = document.getElementById('excellent-info-' + index);
