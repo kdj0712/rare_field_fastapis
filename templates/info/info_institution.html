@@ -137,20 +137,21 @@
 
 
 {% block js %}
-
 <script type="text/javascript">
   var resultsFromPython = {{ results | tojson | safe }};
 </script>
 <script>
-  let map, service, infowindow, pos, yPos, xPos;
+  let map, service, infowindow;
+  const defaultPos = { lat: 37.5665, lng: 126.9780 }; // 기본 위치 (서울 좌표)
+
   function callback(results, status) {
-    console.log(results);
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       for (let i = 0; i < results.length; i++) {
         createMarker(results[i]);
       }
     }
   }
+
   function getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(sendPositionToServer, showError);
@@ -158,6 +159,7 @@
       alert("Geolocation is not supported by this browser.");
     }
   }
+
   function getLocationAndSubmit() {
     navigator.geolocation.getCurrentPosition(
       async function (position) {
@@ -175,49 +177,14 @@
     );
   }
 
-  // document.addEventListener('DOMContentLoaded', function () {
-  //   checkPosValue();
-  // });
-
-  // function checkPosValue() {
-  //   const posValue = document.getElementById('pos').value;
-  //   if (!posValue) {
-  //     alert('위치 정보가 필요합니다. "Search" 버튼을 클릭해서 위치 정보를 제공해주세요.');
-  //   }
-  // }
-  // function initMap() {
-  //   var map;
-  //   var infowindow = new google.maps.InfoWindow();
-
-  //   function success(position) {
-  //     var pos = {
-  //       lat: position.coords.latitude,
-  //       lng: position.coords.longitude
-  //     };
-
-  //     map = new google.maps.Map(document.getElementById('map'), {
-  //       center: pos,
-  //       zoom: 15,
-  //       draggable: true,
-  //       zoomControl: true,
-  //     });
-
-  //     hospitals.forEach(function (hospital) {
-  //       var marker = new google.maps.Marker({
-  //         position: { lat: parseFloat(hospital.YPos), lng: parseFloat(hospital.XPos) },
-  //         map: map,
-  //         title: hospital.yadmNm
-  //       });
-  //     });
-  //   }
-
-
   function initMap() {
     infowindow = new google.maps.InfoWindow();
 
-    if (navigator.geolocation) {
+    const userLocationConsent = localStorage.getItem('userLocationConsent');
+
+    if (userLocationConsent === 'granted' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
-        pos = {
+        const pos = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
@@ -225,47 +192,45 @@
         map = new google.maps.Map(document.getElementById('map'), {
           center: pos,
           zoom: 15,
-          draggable: true, // 지도 드래그 가능
+          draggable: true,
           zoomControl: true,
         });
-        callback(resultsFromPython, google.maps.places.PlacesServiceStatus.OK);
+        displayMarkers(resultsFromPython);
       }, function () {
-        handleLocationError(true, infowindow, map.getCenter());
+        handleLocationError(true, infowindow, defaultPos);
       });
+    } else if (userLocationConsent === null) {
+      const confirmed = confirm("이 웹사이트는 위치 정보를 사용하여 보다 나은 서비스를 제공합니다. 위치 정보를 제공하시겠습니까?");
+
+      if (confirmed && navigator.geolocation) {
+        localStorage.setItem('userLocationConsent', 'granted');
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: pos,
+            zoom: 15,
+            draggable: true,
+            zoomControl: true,
+          });
+          displayMarkers(resultsFromPython);
+        }, function () {
+          handleLocationError(true, infowindow, defaultPos);
+        });
+      } else if (!confirmed) {
+        handleLocationError(false, infowindow, defaultPos);
+      } else {
+        handleLocationError(false, infowindow, defaultPos);
+      }
     } else {
-      handleLocationError(false, infowindow, map.getCenter());
-    }
-
-  }
-  function toggleExcellentInfo(index) {
-    var infoElement = document.getElementById('excellent-info-' + index);
-    if (infoElement.style.display === 'none') {
-      infoElement.style.display = 'block';
-    } else {
-      infoElement.style.display = 'none';
+      handleLocationError(false, infowindow, defaultPos);
     }
   }
-
-  // function error() {
-  //   var defaultPos = { lat: 37.5665, lng: 126.9780 };
-  //   map = new google.maps.Map(document.getElementById('map'), {
-  //     center: defaultPos,
-  //     zoom: 15
-  //   });
-
-  //   infowindow.setPosition(defaultPos);
-  //   infowindow.setContent('Error: Geolocation failed.');
-  //   infowindow.open(map);
-  // }
-
-  // if (navigator.geolocation) {
-  //   navigator.geolocation.getCurrentPosition(success, error);
-  // } else {
-  //   error();
-  // }
 
   function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    pos = { lat: 37.5665, lng: 126.9780 };
     map = new google.maps.Map(document.getElementById('map'), {
       center: pos,
       zoom: 15,
@@ -277,65 +242,50 @@
       'Error: Your browser doesn\'t support geolocation.');
     infoWindow.open(map);
   }
+
   let markers = [];
 
-  function createMarker(results) {
-    if (!results.geometry || !results.geometry.location) return;
+  function createMarker(place) {
+    if (!place.geometry || !place.geometry.location) return;
     const marker = new google.maps.Marker({
       map,
-      position: results.geometry.location,
+      position: place.geometry.location,
     });
 
     google.maps.event.addListener(marker, 'click', function () {
-      infowindow.setContent(results.name);
+      infowindow.setContent(place.name);
       infowindow.open(map, this);
     });
   }
-  function displayResultsOnMap(results, map) {
-    results.forEach((hospital) => {
+
+  function displayMarkers(results) {
+    if (results.length === 0) return;
+
+    markers.forEach((marker) => marker.setMap(null)); // 기존 마커 제거
+    markers = [];
+
+    results.forEach((result) => {
       const marker = new google.maps.Marker({
-        position: { lat: hospital.YPos, lng: hospital.XPos }, // 수정됨
+        position: { lat: parseFloat(result.YPos), lng: parseFloat(result.XPos) },
         map: map,
-        title: hospital.yadmNm // 수정됨
+        title: result.yadmNm
       });
       markers.push(marker);
 
       marker.addListener('click', () => {
-        const infoWindow = new google.maps.InfoWindow({
-          content: `${hospital.yadmNm}<br> ${hospital.addr}` // 수정됨
-        });
-        infoWindow.open(map, marker);
+        infowindow.setContent(`${result.yadmNm}<br>${result.addr}`);
+        infowindow.open(map, marker);
       });
-
     });
   }
 
-  function requestUserLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const userPos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-
-        map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 13,
-          center: userPos,
-        });
-        displayResultsOnMap(resultsFromPython, map);
-      });
-    }
-  }
-
-  function focusOnMap(index, map) {
-    const marker = markers[index]; // 전역 마커 배열에서 마커를 가져옴
+  function focusOnMap(index) {
+    const marker = markers[index];
     map.setCenter(marker.getPosition());
-    map.setZoom(16); // 확대 수준을 조정할 수 있음
+    map.setZoom(16);
   }
 
-  window.onload = requestUserLocation;
+  window.onload = initMap;
 </script>
-<!-- Google Maps API Script -->
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&libraries=places&callback=initMap&language=ko"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&libraries=places&callback=initMap&language=ko"></script>
 {% endblock js %}
