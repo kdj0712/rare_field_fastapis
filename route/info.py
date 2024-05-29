@@ -329,13 +329,14 @@ async def institution(request:Request):
 
 # rest api info_raredisease
 
+
 @router.post("/raredisease/{page_number}")
 @router.post("/raredisease") 
 async def raredisease_list(
     request: Request,
     page_number: int = 1,
     key_name: Optional[str] = Query(None),
-    search_word: Optional[str] = Query(None)    
+    search_word: Optional[str] = Query(None)
     ):
     sys.setrecursionlimit(1500)
     
@@ -345,7 +346,7 @@ async def raredisease_list(
     
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
-
+    
     if search_word:
         search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
     
@@ -375,8 +376,6 @@ async def raredisease_list(
     elif key_name==None: # key_name이 없을 경우 모든 질환의 리스트를 출력
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return {'dise_list': dise_list, 'pagination': pagination.to_dict()}
-
-
 
 
 
