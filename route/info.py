@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from utils.paginations import Paginations
 from sklearn.metrics.pairwise import cosine_similarity
 from google.cloud import storage
+import urllib.parse
 import pandas as pd
 import requests
 import pickle
@@ -334,7 +335,7 @@ async def raredisease_list(
     request: Request,
     page_number: int = 1,
     key_name: Optional[str] = Query(None),
-    search_word: Optional[str] = Query(None)
+    search_word: Optional[str] = Query(None)    
     ):
     sys.setrecursionlimit(1500)
     
@@ -344,6 +345,10 @@ async def raredisease_list(
     
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
+
+    if search_word:
+        search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
+    
     if key_name and search_word:
         if key_name == 'dise_name_kr':
             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
@@ -447,6 +452,7 @@ async def search_hospital(
     pos = request.query_params.get('pos')
     try: 
         if keyword and pos:
+            keyword = urllib.parse.unquote(keyword)  # URL 디코딩 처리
             yPos, xPos = pos.split(',')
             yPos = float(yPos)
             xPos = float(xPos)
@@ -536,7 +542,9 @@ async def paper_list(
 
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
+
     if search_word:
+        search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
         if key_name == 'thesis_name':
             conditions.update({ 'research_title': { '$regex': search_word }})
         elif key_name == 'thesis_date':
@@ -563,6 +571,7 @@ async def paper_list_pub(
     conditions = {}
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
+    
     if search_word:
         if key_name == 'thesis_name':
             conditions.update({ 'title': { '$regex': search_word }})
@@ -596,7 +605,9 @@ async def paper_list_pub(
     conditions = {}
     key_name = request.query_params.get('key_name')
     search_word = request.query_params.get('search_word')
+
     if search_word:
+        search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
         if key_name == 'thesis_name':
             conditions.update({ 'title': { '$regex': search_word }})
         elif key_name == 'thesis_date':

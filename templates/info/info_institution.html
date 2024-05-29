@@ -230,6 +230,14 @@
     }
   }
 
+  function toggleExcellentInfo(index) {
+    var infoElement = document.getElementById('excellent-info-' + index);
+    if (infoElement.style.display === 'none') {
+      infoElement.style.display = 'block';
+    } else {
+      infoElement.style.display = 'none';
+    }
+  }
   function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     map = new google.maps.Map(document.getElementById('map'), {
       center: pos,
