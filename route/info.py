@@ -348,7 +348,7 @@ async def raredisease_list(
     search_word = request.query_params.get('search_word')
     
     if search_word:
-        search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
+        search_word = urllib.parse.unquote(search_word, encoding='utf-8')  # URL 디코딩 처리
     
     if key_name and search_word:
         if key_name == 'dise_name_kr':
