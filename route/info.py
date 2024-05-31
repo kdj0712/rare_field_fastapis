@@ -228,51 +228,6 @@ async def get_excellent_hospital_info(ykiho: str):
 
 #### -------------------------------------------------------------------------------------------------------
 
-# 희귀질환정보검색
-# @router.post("/info_raredisease", response_class=HTMLResponse) 
-# async def raredisease(request:Request):
-# #     return templates.TemplateResponse(name="search/search_raredisease.html", context={'request':request})
-# @router.post("/info_raredisease", response_class=HTMLResponse) 
-# @router.get("/info_raredisease/{page_number}")
-# @router.get("/info_raredisease")
-# async def disease_list(
-#     request: Request
-#     , page_number: int = 1
-#     , key_name: Optional[str] = Query(None)
-#     , search_word: Optional[str] = Query(None)
-#     ):
-    
-#     await request.form()
-    
-#     conditions = {}
-    
-#     key_name = request.query_params.get('key_name')
-#     search_word = request.query_params.get('search_word')
-#     if key_name and search_word:
-#         # 검색 조건을 기반으로 질환을 필터링하는 로직
-#         if key_name == 'dise_name_kr': # 희귀질환명으로 검색하는 로직
-#             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
-#         elif key_name == 'dise_KCD_code':  # KCD코드를 검색하는 로직
-#             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
-#         elif key_name == 'dise_spc_code': #spc코드를 검색하는 로직
-#             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
-#         elif key_name == 'dise_symptoms': #증상명으로 검색하는 로직
-#             similar_diseases_names = predict_disease(search_word)  # 유사 질병 이름을 얻습니다.
-#             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
-
-#         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-#         return templates.TemplateResponse(
-#             name="/info/info_raredisease.html",
-#             context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name':key_name,'search_word' : search_word})
-
-#     else: # key_name이 없을 경우 모든 질환의 리스트를 출력
-#         dise_list = await collection_disease.get_all()
-#         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-
-#         return templates.TemplateResponse(
-#             name="/info/info_raredisease.html",
-#             context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
-# @router.post("/info_raredisease", response_class=HTMLResponse) 
 @router.get("/info_raredisease/{page_number}")
 @router.get("/info_raredisease")
 async def disease_list(
@@ -326,9 +281,7 @@ async def disease_list(
 async def institution(request:Request):
     return templates.TemplateResponse(name="info/info_raredisease_nondata.html", context={'request':request})
 
-
 # rest api info_raredisease
-
 
 @router.post("/raredisease/{page_number}")
 @router.post("/raredisease") 
@@ -378,9 +331,8 @@ async def raredisease_list(
         return {'dise_list': dise_list, 'pagination': pagination.to_dict()}
 
 
-
-
 #### -------------------------------------------------------------------------------------------------------
+
 @router.get("/info_institution/{page_number}")
 @router.get("/info_institution") 
 async def search_hospital(
@@ -431,12 +383,8 @@ async def search_hospital(
                 name="info/info_institution.html",
                 context={"request": request, 'pagination': pagination, "results": page_data, 'API_KEY': api_key})
         else:
-            # results = []
-            # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
             return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": [],'API_KEY': api_key})
     except:
-        # results = []
-        # page_data, pagination = paginationforinstitute(results, page_number, totalCount)
         return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [],'API_KEY': api_key})
 
 @router.post("/institution/{page_number}")
@@ -492,7 +440,6 @@ async def search_hospital(
     except:
         return {'pagination': None, "results": [],'API_KEY': api_key}
 
-
 #### -------------------------------------------------------------------------------------------------------
 
 # 학술정보
@@ -521,7 +468,7 @@ async def paper_list(
             name="/info/info_academicinfo.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word })
 
-    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+    else:
         paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
 
         return templates.TemplateResponse(
@@ -553,7 +500,7 @@ async def paper_list(
         paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
         return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
 
-    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+    else:
         paper_list, pagination = await collection_info_academicinfo_Riss.gbcwp_reverse_year(conditions, page_number)
 
         return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination
@@ -583,13 +530,12 @@ async def paper_list_pub(
             name="/info/info_academicinfo_pubmed.html",
             context={'request': request,'papers': paper_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word })
 
-    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+    else:
         paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions,page_number)
 
         return templates.TemplateResponse(
             name="/info/info_academicinfo_pubmed.html",
-            context={'request': request,'papers': paper_list, 'pagination': pagination })#'papers': papers, 'pagination': pagination
-
+            context={'request': request,'papers': paper_list, 'pagination': pagination })
 
 @router.post("/academicinfo_pub_med/{page_number}")
 @router.post("/academicinfo_pub_med")
@@ -606,7 +552,7 @@ async def paper_list_pub(
     search_word = request.query_params.get('search_word')
 
     if search_word:
-        search_word = urllib.parse.unquote(search_word)  # URL 디코딩 처리
+        search_word = urllib.parse.unquote(search_word)  
         if key_name == 'thesis_name':
             conditions.update({ 'title': { '$regex': search_word }})
         elif key_name == 'thesis_date':
@@ -616,7 +562,7 @@ async def paper_list_pub(
         paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions, page_number)
         return {'papers': paper_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word }
 
-    else: # key_name이 없을 경우 모든 질환의 리스트를 출력
+    else: 
         paper_list, pagination = await collection_info_academicinfo_eng.gbcwp_reverse_year(conditions,page_number)
 
         return {'papers': paper_list, 'pagination': pagination.to_dict() }#'papers': papers, 'pagination': pagination

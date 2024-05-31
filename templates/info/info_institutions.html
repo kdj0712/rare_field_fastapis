@@ -1,36 +1,3 @@
-<!-- {% extends "mainpage.html" %}
-
-{% block main_container %}
-<form action="" method=get>
-  <div class="container">
-    <div class="row">
-      <div class="col-6" id="map" style="width: 600px; height: 600px;"></div>
-      <div class="col-6">
-        <label for="keyword">검색할 장소를 입력하세요</label>
-        <input type="text" id="keyword" name="keyword" class="controls" placeholder="입력하기"
-          value="{{request._query_params.keyword}}">
-        <button type="submit">Search</button> -->
-<!-- onclick="searchPlaces()"></onclick> -->
-<!-- <div class="row">
-          <table id="places">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Address</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-            {% for result in results %}
-            <tr>
-              <td>{{result.name}}</td>
-              <td>{{result.formatted_address}}</td>
-            </tr>
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-    </div>
-</form> -->
 {% extends "maintemplate.html" %}
 {% block main_container %}
 <form action="" id="maps" class="container">
@@ -41,7 +8,6 @@
         <label for="keyword">검색할 장소를 입력하세요</label>
         <input type="text" id="keyword" name="keyword" class="controls" placeholder="입력하기"
           value="{{request._query_params.keyword}}">
-        <!-- Hidden fields for latitude and longitude -->
         <input type="hidden" id="pos" name="pos" value="pos">
         <button type="button" formmethod="get" onclick="getLocationAndSubmit()">Search</button>
         <div class="row">
@@ -65,9 +31,6 @@
     </div>
 </form>
 {% endblock main_container%}
-
-
-
 
 {% block js %}
 <script type="text/javascript">
