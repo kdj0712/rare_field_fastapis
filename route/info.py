@@ -250,21 +250,17 @@ async def disease_list(
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
+        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+            range_start, range_end = search_word.split('-')
+            if range_start != '코드 없음':
+                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+            else:
+                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+            dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         elif key_name == 'dise_symptoms':
             similar_diseases_names = predict_disease(search_word)
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
-        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        return templates.TemplateResponse(
-            name="/info/info_raredisease.html",
-            context={'request': request, 'dise_list': dise_list, 'pagination': pagination,'key_name': key_name,'search_word': search_word})
-
-    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-        range_start, range_end = search_word.split('-')
-        if range_start != '코드 없음':
-            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-        else:
-            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return templates.TemplateResponse(
             name="/info/info_raredisease.html",
@@ -308,21 +304,18 @@ async def raredisease_list(
             conditions.update({ 'dise_name_kr': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code':
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
+        elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
+            range_start, range_end = search_word.split('-')
+            if range_start != '코드 없음':
+                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
+            else:
+                conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_symptoms':
             similar_diseases_names = predict_disease(search_word)
             conditions.update({'dise_name_kr': {'$in': similar_diseases_names}})
 
-        dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
-        return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
-    elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-        range_start, range_end = search_word.split('-')
-        if range_start != '코드 없음':
-            conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-        else:
-            conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
-            
         dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         return {'dise_list': dise_list, 'pagination': pagination.to_dict(),'key_name': key_name,'search_word': search_word}
 
