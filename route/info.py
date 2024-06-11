@@ -251,11 +251,11 @@ async def disease_list(
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
+            if search_word == '코드없음':
                 conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+            else:
+                range_start, range_end = search_word.split('-')
+                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
             dise_list, pagination = await collection_disease.getsbyconditionswithpagination(conditions, page_number)
         elif key_name == 'dise_symptoms':
             similar_diseases_names = predict_disease(search_word)
@@ -272,10 +272,6 @@ async def disease_list(
         return templates.TemplateResponse(
             name="/info/info_raredisease.html",
             context={'request': request, 'dise_list': dise_list, 'pagination': pagination})
-
-@router.get("/info_raredisease_nondata", response_class=HTMLResponse) 
-async def institution(request:Request):
-    return templates.TemplateResponse(name="info/info_raredisease_nondata.html", context={'request':request})
 
 # rest api info_raredisease
 
@@ -305,11 +301,11 @@ async def raredisease_list(
         elif key_name == 'dise_KCD_code':
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
-            range_start, range_end = search_word.split('-')
-            if range_start != '코드없음':
-                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
-            else:
+            if search_word == '코드없음':
                 conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
+            else:
+                range_start, range_end = search_word.split('-')
+                conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
         elif key_name == 'dise_spc_code':
             conditions.update({ 'dise_spc_code': { '$regex': search_word }})
         elif key_name == 'dise_symptoms':
