@@ -306,7 +306,7 @@ async def raredisease_list(
             conditions.update({ 'dise_KCD_code': { '$regex': search_word }})
         elif key_name == 'dise_KCD_code_range':  # KCD 코드 범위를 검색하는 로직
             range_start, range_end = search_word.split('-')
-            if range_start != '코드 없음':
+            if range_start != '코드없음':
                 conditions.update({ 'dise_KCD_code': {'$gte': range_start, '$lte': range_end}})
             else:
                 conditions.update({ 'dise_KCD_code': { '$regex': '없음' }})
