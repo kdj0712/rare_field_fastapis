@@ -9,8 +9,8 @@ from models.trend_documents import trend_documents
 from models.trend_guideline import trend_guideline
 from models.trend_law import trend_law
 from models.trend_site import trend_site
-
 from models.trend_news import news_trends # mongodb 추가해서 넣어야 함
+import urllib.parse
 
 from typing import List, Dict
 
@@ -109,6 +109,8 @@ async def get_news_data(
     
     conditions = {}
     search_word = request.query_params.get('search_word')
+    if search_word:
+        search_word = urllib.parse.unquote(search_word, encoding='utf-8')  # URL 디코딩 처리
 
     # 검색
     if search_word :
