@@ -370,11 +370,11 @@ async def search_hospital(
             page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
             return templates.TemplateResponse(
                 name="info/info_institution.html",
-                context={"request": request, 'pagination': pagination, "results": page_data, 'API_KEY': api_key})
+                context={"request": request, 'pagination': pagination, "results": page_data})
         else:
-            return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": [],'API_KEY': api_key})
+            return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": []})
     except:
-        return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [],'API_KEY': api_key})
+        return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": []})
 
 @router.post("/institution/{page_number}")
 @router.post("/institution") 
@@ -423,11 +423,11 @@ async def search_hospital(
                     'excellent_info': hospital['excellent_info']
                 })
             page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
-            return {'pagination': pagination.to_dict(), "results": page_data, 'API_KEY': api_key}
+            return {'pagination': pagination.to_dict(), "results": page_data}
         else:
-            return {'pagination': None, "results": [],'API_KEY': api_key}
+            return {'pagination': None, "results": []}
     except:
-        return {'pagination': None, "results": [],'API_KEY': api_key}
+        return {'pagination': None, "results": []}
 
 #### -------------------------------------------------------------------------------------------------------
 
