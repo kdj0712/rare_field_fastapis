@@ -106,7 +106,10 @@ async def get_news_data(
 ):
 
     await request.form()
-    
+
+    if category:
+        category = urllib.parse.unquote(category, encoding='utf-8')  # URL 디코딩 처리    
+
     conditions = {}
     search_word = request.query_params.get('search_word')
     if search_word:
