@@ -216,6 +216,18 @@ async def trend_guideline_read_func(
         , context={"request" : request, "guidelines" : guideline}
     )
 
+@router.post("/guideline_read/{object_id}", response_class=HTMLResponse)
+async def guideline_read_func(
+    request:Request
+    ,object_id : PydanticObjectId
+):
+    
+    guideline = await collection_trend_guideline.get(object_id)
+
+    return {"request" : request, "guidelines" : guideline}
+    
+
+
 # restapi 생성
 @router.post("/trend_guideline_data", response_model=Dict[str, List])
 async def get_guideline_data():
