@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 import datetime
 
 class info_academicinfo_Riss(Document):
+    _id : Optional[str] = None
     research_title: Optional[str] = None
     research_url: Optional[str] = None
     research_author: Optional[str] = None
@@ -24,6 +25,7 @@ class info_academicinfo_Riss(Document):
 
 
 class info_academicinfo_eng(Document):
+    _id : Optional[str] = None
     title: Optional[str] = None
     Article_date: Optional[str] = None
     abstract: Optional[str] = None

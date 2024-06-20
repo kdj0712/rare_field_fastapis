@@ -4,6 +4,7 @@ from beanie import Document, Link
 from pydantic import BaseModel, EmailStr
 
 class trend_site(Document):
+    _id : Optional[str] = None
     site_link: Optional[str] = None
     site_name: Optional[str] = None
     site_where : Optional[str] = None

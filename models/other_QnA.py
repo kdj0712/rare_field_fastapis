@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class QnA(Document):
+    _id : Optional[str] = None
     ques_title: Optional[str] = None
     ques_writer: Optional[str] = None
     ques_content: Optional[str] = None

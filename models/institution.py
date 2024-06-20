@@ -4,6 +4,7 @@ from beanie import Document, Link
 from pydantic import BaseModel
 
 class Institutions(Document):
+    _id : Optional[str] = None
     hospital_name: Optional[str] = None
     hospital_address: Optional[str] = None
     hospital_phone: Optional[int] = None

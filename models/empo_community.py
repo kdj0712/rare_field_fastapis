@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class community(Document):
+    _id : Optional[str] = None
     community_type: Optional[str] = None
     community_subject: Optional[str] = None
     community_title: Optional[str] = None

@@ -224,7 +224,7 @@ async def guideline_read_func(
     
     guideline = await collection_trend_guideline.get(object_id)
 
-    return {"request" : request, "guidelines" : guideline}
+    return {"guidelines" : guideline}
     
 
 

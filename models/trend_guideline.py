@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 import datetime
 
 class trend_guideline(Document):
+    _id : Optional[str] = None
     importance: Optional[str] = None
     post_cate: Optional[str] = None
     post_title: Optional[str] = None

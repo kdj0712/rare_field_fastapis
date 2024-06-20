@@ -4,6 +4,7 @@ from beanie import Document, Link
 from pydantic import BaseModel, EmailStr
 
 class news_trends(Document):
+    _id : Optional[str] = None
     news_title: Optional[str] = None
     news_datetime: Optional[datetime] = None
     news_contents : Optional[str] = None

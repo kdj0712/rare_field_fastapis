@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class notice(Document):
+    _id : Optional[str] = None
     notice_title: Optional[str] = None
     notice_date: Optional[datetime] = None
     notice_type: Optional[str] = None

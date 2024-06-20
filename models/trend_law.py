@@ -4,6 +4,7 @@ from beanie import Document, Link
 from pydantic import BaseModel, EmailStr
 
 class trend_law(Document):
+    _id : Optional[str] = None
     law_name: Optional[str] = None
     promulgation_number: Optional[str] = None
     promulgation_date : Optional[datetime] = None
