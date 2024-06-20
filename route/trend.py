@@ -216,11 +216,11 @@ async def trend_guideline_read_func(
         , context={"request" : request, "guidelines" : guideline}
     )
 
-@router.post("/guideline_read/{object_id}", response_class=HTMLResponse)
+@router.post("/guideline_read/{object_id}")
 async def guideline_read_func(
-    request:Request
-    ,object_id : PydanticObjectId
-):
+            request:Request
+            ,object_id : PydanticObjectId
+            ):
     
     guideline = await collection_trend_guideline.get(object_id)
 
